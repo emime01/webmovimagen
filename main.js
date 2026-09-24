@@ -121,9 +121,9 @@
   const lerp01 = (p, a, b) => clamp((p - a) / (b - a), 0, 1);
   const clean = (t) => t.replace(/\s*⟲/g, "").trim();
   const fmtKm = (n) => String(n).replace(".", ",");
-  const DATA = Object.assign({ ruteros: [], shoppings: [], pantallas: [], walls: [] }, window.SOPORTES);
-  const TYPE_LABEL = { shopping: "Shopping", rutero: "Rutero", pantalla: "Pantalla gigante", wall: "Wall" };
-  const ORDER = { shopping: 0, rutero: 1, pantalla: 2, wall: 3 };
+  const DATA = Object.assign({ ruteros: [], shoppings: [], pantallas: [], walls: [], duty: [] }, window.SOPORTES);
+  const TYPE_LABEL = { shopping: "Shopping", rutero: "Rutero", pantalla: "Pantalla gigante", wall: "Wall", duty: "Duty Select" };
+  const ORDER = { shopping: 0, rutero: 1, pantalla: 2, wall: 3, duty: 4 };
 
   const sites = [
     ...DATA.shoppings.map(([name, n, lat, lng]) => {
@@ -137,26 +137,33 @@
     }),
     ...DATA.pantallas.map(([place, kind, lat, lng]) => ({ type: "pantalla", lat, lng, title: place, detail: kind })),
     ...DATA.walls.map(([place, lat, lng]) => ({ type: "wall", lat, lng, title: place, detail: "Medianera" })),
+    ...DATA.duty.map(([place, kind, lat, lng]) => ({ type: "duty", lat, lng, title: place, detail: kind })),
   ].map((site) => ({ ...site, xy: project(site.lat, site.lng) }));
 
   const countOf = (t) => sites.filter((x) => x.type === t).length;
-  const totalSoportes = sites.reduce((n, x) => n + (x.type === "shopping" ? x.n : 1), 0);
+  // Los aeropuertos tienen un circuito de pantallas: se cuentan aparte, no como un soporte.
+  const totalSoportes = sites.reduce((n, x) => n + (x.type === "shopping" ? x.n : x.type === "duty" ? 0 : 1), 0);
+  const duty = sites.filter((x) => x.type === "duty");
+  const joinList = (arr) => (arr.length > 1 ? `${arr.slice(0, -1).join(", ")} y ${arr[arr.length - 1]}` : arr.join(""));
   const ib = sites.filter((x) => x.type === "rutero" && x.route === "Interbalnearia").sort((a, b) => a.km - b.km);
   const mvdSites = sites.filter((x) => (x.type === "pantalla" || x.type === "wall") && x.lng < -56 && x.lng > -56.45 && x.lat > -34.95 && x.lat < -34.8);
   const pdeSites = sites.filter((x) => x.lng > -55.02);
   const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
   const mvdP = mvdSites.filter((x) => x.type === "pantalla").length, mvdW = mvdSites.length - mvdP;
+  const dutyText = duty.length ? ` Y Duty Select en ${duty.length === 1 ? "el aeropuerto" : "los aeropuertos"} de ${joinList(duty.map((x) => x.title.replace(/^Aeropuerto de /, "")))}.` : "";
   const CAPTIONS = {
     start: ["Uruguay", "Presencia en todo el país."],
     light: "Presencia en los 19 departamentos.",
-    points: ["Todo el país", `${totalSoportes} soportes fijos en el mapa. ${finePointer ? "Pasá el mouse por un punto" : "Tocá un punto"} para ver el detalle.`],
+    points: ["Todo el país", `${totalSoportes} soportes fijos${duty.length ? ` y pantallas en ${plural(duty.length, "aeropuerto", "aeropuertos")}` : ""}. ${finePointer ? "Pasá el mouse por un punto" : "Tocá un punto"} para ver el detalle.`],
     mvd: ["Montevideo", `${plural(mvdP, "pantalla gigante", "pantallas gigantes")} y ${plural(mvdW, "wall", "walls")} en puntos estratégicos de la ciudad.`],
-    costa: ["Interbalnearia", ib.length ? `${ib.length} ruteros entre el km ${fmtKm(ib[0].km)} y el km ${fmtKm(ib[ib.length - 1].km)}, camino a Punta del Este.` : ""],
-    end: ["Todo el país", `${plural(countOf("rutero"), "rutero", "ruteros")}, ${plural(countOf("shopping"), "shopping", "shoppings")}, ${plural(countOf("pantalla"), "pantalla gigante", "pantallas gigantes")} y ${plural(countOf("wall"), "wall", "walls")}, de Salto a Punta del Este.`],
+    costa: ["Interbalnearia", ib.length ? `${ib.length} ruteros entre el km ${fmtKm(ib[0].km)} y el km ${fmtKm(ib[ib.length - 1].km)}, camino a Punta del Este.${dutyText}` : dutyText.trim()],
+    end: ["Todo el país", `${joinList([
+      ["rutero", "rutero", "ruteros"], ["shopping", "shopping", "shoppings"], ["pantalla", "pantalla gigante", "pantallas gigantes"], ["wall", "wall", "walls"], ["duty", "aeropuerto", "aeropuertos"],
+    ].filter(([t]) => countOf(t)).map(([t, one, many]) => plural(countOf(t), one, many)))}, de Salto a Punta del Este.`],
   };
 
   // Leyenda (sin filtros: todos los soportes se ven siempre)
-  const LEGEND = [["rutero", "Ruteros"], ["shopping", "Shoppings"], ["pantalla", "Pantallas gigantes"], ["wall", "Walls"]];
+  const LEGEND = [["rutero", "Ruteros"], ["shopping", "Shoppings"], ["pantalla", "Pantallas gigantes"], ["wall", "Walls"], ["duty", "Duty Select"]];
   $("#covLegend").innerHTML = LEGEND.map(([t, name]) => `<li><i class="shape shape-${t}"></i>${name} <span data-n="${countOf(t)}">(0)</span></li>`).join("");
   const legendNums = $$("#covLegend span");
 
@@ -200,6 +207,7 @@
     .filter((c) => c.length >= 4)
     .map((c) => makeLabel(avgXY(c), `km ${fmtKm(c[0].km)}–${fmtKm(c[c.length - 1].km)} (${c.length})`, "costa"));
   if (pdeSites.length) costaLabels.push(makeLabel(avgXY(pdeSites), "Punta del Este", "costa"));
+  duty.forEach((x) => costaLabels.push(makeLabel(x.xy, x.title, "costa")));
   const allLabels = [...mvdLabels, ...costaLabels];
 
   // Cámaras: todo el país → Montevideo → Interbalnearia → todo el país
@@ -208,7 +216,8 @@
     return { x0: Math.min(...xs), x1: Math.max(...xs), y0: Math.min(...ys), y1: Math.max(...ys) };
   };
   const mvdBox = mvdSites.length ? bbox(mvdSites) : { x0: 195, x1: 200, y0: 488, y1: 491 };
-  const costaBox = bbox([...ib, ...pdeSites].length ? [...ib, ...pdeSites] : sites);
+  const costaSites = [...ib, ...pdeSites, ...duty];
+  const costaBox = bbox(costaSites.length ? costaSites : sites);
   const CAMS = {
     full: () => ({ cx: 229.5, cy: 251, w: 459 * 1.14 }), // margen para que la costa no caiga en el borde difuminado
     mvd: () => ({ cx: (mvdBox.x0 + mvdBox.x1) / 2, cy: (mvdBox.y0 + mvdBox.y1) / 2, w: Math.max((mvdBox.x1 - mvdBox.x0) * 1.7, covMap.clientWidth / 60) }),

@@ -28,7 +28,7 @@ Librerías por CDN: GSAP + ScrollTrigger y Lenis. Si no cargan, la página se mu
 Las imágenes en `assets/` vienen de movimagen.com.uy. Límites de departamentos y rutas: Natural Earth (dominio público).
 
 ## Soportes del mapa
-Están en `soportes.js` (ruteros, shoppings, pantallas y walls con sus coordenadas). Para sumar uno, agregá una línea en la lista que corresponda; el mapa, la leyenda y los textos se actualizan solos.
+Están en `soportes.js` (ruteros, shoppings, pantallas, walls y aeropuertos de Duty Select con sus coordenadas). Para sumar uno, agregá una línea en la lista que corresponda; el mapa, la leyenda y los textos se actualizan solos.
 
 ## Pendiente
 - Conectar el formulario a un backend (hoy arma un mail a info@movimagen.com)

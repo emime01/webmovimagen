@@ -80,4 +80,10 @@ window.SOPORTES = {
     ["Av. Italia y Caldas", -34.884, -56.129],
     ["Bvar. Batlle y Ordóñez y Av. Rivera", -34.8985, -56.1467],
   ],
+
+  // Duty Select: circuito de pantallas en los free shops. [aeropuerto, detalle, lat, lng]
+  duty: [
+    ["Aeropuerto de Carrasco", "Circuito de pantallas en free shop", -34.8384, -56.0308],
+    ["Aeropuerto de Punta del Este", "Circuito de pantallas en free shop", -34.8551, -55.0943],
+  ],
 };
