@@ -231,12 +231,24 @@
   });
 
   /* ---------- Valores: imágenes flotando ---------- */
-  $$(".float").forEach((el) => {
-    gsap.to(el, {
-      y: () => -innerHeight * 1.7 * +el.dataset.speed,
-      ease: "none",
-      scrollTrigger: { trigger: ".values", start: "top bottom", end: "bottom top", scrub: true, invalidateOnRefresh: true },
-    });
+  // Las fotos nacen chicas en el centro y salen hacia los bordes agrandándose,
+  // una detrás de otra, como si vinieran hacia la pantalla.
+  const floats = $$(".float");
+  const flyTl = gsap.timeline({ scrollTrigger: { trigger: ".values", start: "top top", end: "bottom bottom", scrub: 0.6, invalidateOnRefresh: true } });
+  floats.forEach((el, i) => {
+    const angle = i * 2.399 + 0.6; // ángulo áureo: reparte las direcciones sin repetir
+    const cos = Math.cos(angle), sin = Math.sin(angle);
+    const END_SCALE = 1.9;
+    // Distancia justa para que la foto (ya agrandada) salga por completo por el borde
+    const exit = () => {
+      const w = (el.offsetWidth * END_SCALE) / 2 + innerWidth / 2;
+      const h = (el.offsetHeight * END_SCALE) / 2 + innerHeight / 2;
+      return Math.min(w / Math.max(Math.abs(cos), 0.01), h / Math.max(Math.abs(sin), 0.01)) * 1.05;
+    };
+    const at = i * 0.18;
+    flyTl
+      .fromTo(el, { x: 0, y: 0, scale: 0.05 }, { x: () => cos * exit(), y: () => sin * exit(), scale: END_SCALE, duration: 1, ease: "power1.in" }, at)
+      .fromTo(el, { opacity: 0 }, { opacity: 1, duration: 0.12, ease: "none" }, at);
   });
   gsap.fromTo(".circles", { rotate: -20, scale: 0.9 }, { rotate: 20, scale: 1.05, ease: "none", scrollTrigger: { trigger: ".values", start: "top bottom", end: "bottom top", scrub: true } });
   gsap.from(".values-title", { opacity: 0, y: 40, duration: 1.2, ease: "expo.out", scrollTrigger: { trigger: ".values", start: "top 40%" } });

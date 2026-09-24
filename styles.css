@@ -91,7 +91,7 @@ body.on-white .nav { color: var(--orange); }
 [data-words] .w.on { color: var(--fg); }
 
 /* ---------- Valores ---------- */
-.values { position: relative; height: 220vh; }
+.values { position: relative; height: 380vh; }
 .values-sticky { position: sticky; top: 0; height: 100svh; display: grid; place-items: center; overflow: hidden; }
 .circles { position: absolute; width: min(74vw, 74vh); height: auto; overflow: visible; }
 .circles circle { fill: none; stroke: rgba(255,255,255,0.45); stroke-width: 1; vector-effect: non-scaling-stroke; }
@@ -102,13 +102,9 @@ body.on-white .nav { color: var(--orange); }
 .cl-3 { right: calc(50% - min(37vw, 37vh) - 20px); top: 62%; transform: translateX(100%); }
 .values-title { position: relative; z-index: 3; text-align: center; font-size: clamp(22px, 2.5vw, 36px); line-height: 1.15; letter-spacing: -0.035em; font-weight: 600; }
 .floats { position: absolute; inset: 0; z-index: 2; pointer-events: none; }
-.float { position: absolute; object-fit: cover; will-change: transform; }
-.f1 { width: 18vw; aspect-ratio: 4/3; left: 6vw; top: 100%; }
-.f2 { width: 26vw; aspect-ratio: 3/2; right: 0; top: 120%; }
-.f3 { width: 12vw; aspect-ratio: 4/3; left: 50%; top: 140%; }
-.f4 { width: 16vw; aspect-ratio: 4/3; left: 28vw; top: 175%; }
-.f5 { width: 22vw; aspect-ratio: 3/2; left: 0; top: 210%; }
-.f6 { width: 15vw; aspect-ratio: 4/3; right: 14vw; top: 230%; }
+.float { position: absolute; left: 50%; top: 50%; width: 15vw; aspect-ratio: 4/3; margin: -5.6vw 0 0 -7.5vw; object-fit: cover; opacity: 0; will-change: transform, opacity; }
+.float:nth-child(3n) { width: 11vw; margin: -4.1vw 0 0 -5.5vw; }
+.float:nth-child(4n) { width: 19vw; aspect-ratio: 3/2; margin: -6.3vw 0 0 -9.5vw; }
 
 /* ---------- Números ---------- */
 .stats { display: grid; grid-template-columns: repeat(4, 1fr); padding: 0 var(--gutter); }
@@ -261,8 +257,7 @@ body.on-white .nav { color: var(--orange); }
   .stat { padding-bottom: 48px; }
   .circles { width: 86vw; }
   .circle-label { display: none; }
-  .f1, .f3, .f4, .f6 { width: 30vw; }
-  .f2, .f5 { width: 44vw; }
+  .float, .float:nth-child(3n), .float:nth-child(4n) { width: 34vw; aspect-ratio: 4/3; margin: -12.75vw 0 0 -17vw; }
   .product-list li { grid-template-columns: 1fr 1fr; gap: 4px 12px; padding: 18px 0; }
   .product-list h3 { grid-column: 1 / -1; grid-row: 1; text-align: left; font-size: 11vw; }
   .p-cat, .p-meta { font-size: 11px; }
