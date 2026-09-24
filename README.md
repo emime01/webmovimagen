@@ -13,7 +13,7 @@ python3 -m http.server 8000
 Inspirada en ghuynguyen.vercel.app, con el contenido de la web actual de Movimagen. Colores de marca: naranja #EB691C y blanco. Fuente: Montserrat.
 
 1. Carga: ventana con fotos de campañas que se agranda hasta ser la portada
-2. Portada: la ciudad ilustrada de Movimagen se dibuja sola desde el centro de la ruta (WebGL) y se ilumina donde pasa el mouse; el 30 asoma por detrás de los edificios. Sin WebGL se ve la ilustración quieta
+2. Portada: la ciudad ilustrada de Movimagen se dibuja sola desde el centro de la ruta (WebGL) y se ilumina donde pasa el mouse; "+30 años" asoma por detrás de los edificios. Sin WebGL se ve la ilustración quieta
 3. Sobre nosotros: texto que se ilumina palabra por palabra al hacer scroll
 4. Valores: confianza, flexibilidad y cercanía, con fotos que salen desde el centro
 5. Cobertura: los números (30 años, 50+ soportes, departamentos con soportes, 5 terminales) junto al mapa. Se pintan de naranja solo los departamentos con soportes; al pasar por uno se ve un resumen de lo que hay. Las rutas con sus carteles aparecen solo al elegir Ruteros en Productos
