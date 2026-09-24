@@ -13,7 +13,7 @@ python3 -m http.server 8000
 Inspirada en ghuynguyen.vercel.app, con el contenido de la web actual de Movimagen. Colores de marca: naranja #EB691C y blanco. Fuente: Montserrat.
 
 1. Carga: ventana con fotos de campañas que se agranda hasta ser la portada
-2. Portada: "30" con luz que sigue al mouse
+2. Portada: la ciudad ilustrada de Movimagen se dibuja sola desde el centro de la ruta (WebGL) y se ilumina donde pasa el mouse; el 30 asoma por detrás de los edificios. Sin WebGL se ve la ilustración quieta
 3. Sobre nosotros: texto que se ilumina palabra por palabra al hacer scroll
 4. Valores: confianza, flexibilidad y cercanía, con fotos que salen desde el centro
 5. Cobertura: los números (30 años, 50+ soportes, departamentos con soportes, 5 terminales) junto al mapa. Se pintan de naranja solo los departamentos con soportes; al pasar por uno se ve un resumen de lo que hay. Las rutas con sus carteles aparecen solo al elegir Ruteros en Productos
@@ -34,10 +34,13 @@ Español e inglés, con el selector ES / EN del menú (la elección se recuerda;
 - Para sumar un texto: ponerle `data-i18n` en el HTML y agregar su versión en inglés en `i18n.js`.
 
 ## Soportes del mapa
-Están en `soportes.js` (ruteros, shoppings, pantallas, walls y aeropuertos de Duty Select con sus coordenadas). Para sumar uno, agregá una línea en la lista que corresponda: su departamento se detecta solo y el mapa, la leyenda y los textos se actualizan.
+Están en `soportes.js` (ruteros, shoppings, pantallas, walls y aeropuertos de Duty Select con sus coordenadas). Para sumar uno, agregá una línea en la lista que corresponda: su departamento se detecta solo y el mapa y los textos se actualizan.
 
 ## Mapa
 Límites de departamentos de geoBoundaries y trazado de rutas de OpenStreetMap (© colaboradores de OpenStreetMap, licencia ODbL: el crédito tiene que quedar visible en el mapa). Proyección Mercator, con más detalle en Montevideo y la costa. Para regenerarlo (por ejemplo, si se suma una ruta nueva), ver `tools/generar-mapa.mjs`.
+
+## Portada
+La ilustración original está en `tools/portada-original.webp`. `tools/generar-portada.mjs` la convierte en `assets/portada/ciudad.webp` (las líneas y el orden en que se dibujan) y en la silueta que tapa el 30 (el `<path>` de `.hero-sil` en `index.html`). Si se cambia la ilustración, hay que volver a correrlo.
 
 ## Pendiente
 - Administrador de contenidos (en pausa): los textos ya están organizados por clave en `i18n.js` y `data-i18n`, así que se puede conectar a una base de datos cuando se retome

@@ -48,13 +48,19 @@
     <!-- HERO -->
     <section class="hero theme-orange" id="inicio">
       <div class="hero-glow" aria-hidden="true"><span class="hero-num">30</span></div>
-      <h1 class="hero-logo"><img src="assets/logo-blanco.png" alt="Movimagen" /></h1>
-      <p class="hero-side hero-left fade-in" data-i18n="hero.left">Publicidad exterior<br />en todo Uruguay.</p>
-      <p class="hero-side hero-right fade-in" data-i18n="hero.right">Más de 30 años conectando<br />marcas con personas.</p>
-      <div class="hero-foot fade-in">
-        <span>34°52'49" S</span>
-        <span>Montevideo, Uruguay</span>
-        <span>56°03'25" W</span>
+      <!-- Ciudad ilustrada: se dibuja con WebGL (main.js); la silueta tapa la parte del 30 que queda detrás -->
+      <div class="hero-city" aria-hidden="true">
+        <svg class="hero-sil" viewBox="0 0 2000 540" preserveAspectRatio="none"><path d="M0 540L0 437L8 437L16 437L24 437L32 437L40 437L48 436L56 436L64 436L72 406L80 403L88 403L96 393L104 386L112 384L120 384L128 380L136 355L144 354L152 351L160 310L168 300L176 297L184 289L192 288L200 290L208 289L216 289L224 261L232 247L240 247L248 224L256 224L264 212L272 212L280 212L288 206L296 197L304 197L312 200L320 196L328 195L336 191L344 190L352 192L360 193L368 195L376 198L384 211L392 211L400 213L408 224L416 241L424 242L432 238L440 234L448 233L456 235L464 244L472 244L480 245L488 256L496 256L504 268L512 268L520 269L528 114L536 113L544 113L552 114L560 114L568 115L576 115L584 116L592 116L600 117L608 118L616 118L624 119L632 120L640 120L648 67L656 53L664 51L672 40L680 38L688 37L696 36L704 36L712 37L720 39L728 41L736 42L744 44L752 46L760 48L768 49L776 143L784 106L792 101L800 85L808 51L816 43L824 33L832 33L840 42L848 48L856 66L864 101L872 103L880 130L888 181L896 180L904 111L912 106L920 102L928 99L936 96L944 94L952 92L960 91L968 90L976 89L984 89L992 88L1000 88L1008 88L1016 88L1024 89L1032 89L1040 90L1048 91L1056 92L1064 94L1072 96L1080 99L1088 101L1096 104L1104 108L1112 113L1120 147L1128 151L1136 143L1144 142L1152 143L1160 126L1168 114L1176 114L1184 115L1192 107L1200 105L1208 105L1216 108L1224 108L1232 108L1240 110L1248 133L1256 130L1264 130L1272 147L1280 102L1288 100L1296 98L1304 96L1312 95L1320 93L1328 92L1336 90L1344 88L1352 87L1360 85L1368 84L1376 84L1384 89L1392 133L1400 69L1408 67L1416 64L1424 62L1432 60L1440 57L1448 55L1456 52L1464 50L1472 47L1480 45L1488 42L1496 40L1504 37L1512 36L1520 38L1528 46L1536 50L1544 90L1552 115L1560 116L1568 127L1576 237L1584 238L1592 239L1600 229L1608 220L1616 212L1624 205L1632 204L1640 199L1648 198L1656 201L1664 204L1672 204L1680 211L1688 213L1696 212L1704 212L1712 217L1720 218L1728 218L1736 218L1744 231L1752 240L1760 247L1768 255L1776 290L1784 291L1792 289L1800 288L1808 288L1816 296L1824 297L1832 299L1840 320L1848 351L1856 354L1864 355L1872 380L1880 384L1888 384L1896 386L1904 402L1912 403L1920 406L1928 414L1936 437L1944 437L1952 437L1960 437L1968 437L1976 437L1984 437L1992 437L2000 438L2000 540Z" /></svg>
+        <svg class="hero-lines" viewBox="0 0 2000 540" preserveAspectRatio="none">
+          <filter id="heroLines" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  1 0 0 0 0" /></filter>
+          <image href="assets/portada/ciudad.webp" width="2000" height="540" filter="url(#heroLines)" />
+        </svg>
+        <canvas class="hero-canvas" id="heroCanvas"></canvas>
+      </div>
+      <div class="hero-sky">
+        <h1 class="hero-logo"><img src="assets/logo-blanco.png" alt="Movimagen" /></h1>
+        <p class="hero-side hero-left fade-in" data-i18n="hero.left">Publicidad exterior<br />en todo Uruguay.</p>
+        <p class="hero-side hero-right fade-in" data-i18n="hero.right">Más de 30 años conectando<br />marcas con personas.</p>
       </div>
     </section>
 
@@ -117,7 +123,6 @@
             <p class="cov-text" id="covText">Dónde están nuestros soportes.</p>
             <button type="button" class="cov-reset" id="covReset" hidden data-i18n="cov.reset">Ver todos los soportes</button>
           </div>
-          <ul class="cov-legend" id="covLegend"></ul>
         </div>
         <div class="cov-map" id="covMap">
           <svg class="map-svg" id="mapSvg" viewBox="0 0 445 486" data-proj='{"lon0":-58.5,"lat0":-30,"k":83,"ox":1.49,"oy":-6.19}' aria-hidden="true">

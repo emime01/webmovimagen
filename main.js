@@ -107,6 +107,133 @@
   productRows.forEach(buildBand);
   onLang(() => productRows.forEach(buildBand));
 
+  /* ---------- Portada: la ciudad ilustrada ---------- */
+  // La textura (tools/generar-portada.mjs) trae las líneas en el rojo y, en el azul, el momento en
+  // que se dibuja cada una. Con WebGL la ciudad se dibuja sola y brilla donde pasa la luz;
+  // sin WebGL queda la versión SVG, quieta.
+  const heroCity = (() => {
+    const hero = $(".hero");
+    const canvas = $("#heroCanvas");
+    const city = { progress: 0, light: { x: 0.5, y: 0.35, s: 0 }, ready: false, render() {}, whenReady(fn) { waiting.push(fn); } };
+    const waiting = [];
+    const fail = () => { hero.classList.remove("is-gl"); city.ready = false; };
+    let gl = null;
+    try { gl = canvas.getContext("webgl", { alpha: true, premultipliedAlpha: true, antialias: false, powerPreference: "low-power" }); } catch (e) { /* sin WebGL */ }
+    if (!gl) return city;
+
+    const VERT = `attribute vec2 aPos; varying vec2 vUv;
+      void main() { vUv = vec2(aPos.x * 0.5 + 0.5, 0.5 - aPos.y * 0.5); gl_Position = vec4(aPos, 0.0, 1.0); }`;
+    // vis: la línea ya está dibujada; hot: recién dibujada (brilla un momento)
+    const FRAG = `
+      #ifdef GL_FRAGMENT_PRECISION_HIGH
+      precision highp float;
+      #else
+      precision mediump float;
+      #endif
+      varying vec2 vUv;
+      uniform sampler2D uTex;
+      uniform vec2 uTexel;
+      uniform float uProgress;
+      uniform vec3 uLight;
+      uniform vec2 uRadius;
+      float vis(float t) { return clamp((uProgress - t) * 60.0, 0.0, 1.0); }
+      float hot(float t) { float s = uProgress - t; return clamp(s * 60.0, 0.0, 1.0) * (1.0 - clamp(s * 7.0, 0.0, 1.0)); }
+      void main() {
+        vec4 c = texture2D(uTex, vUv);
+        float glow = 0.0, spark = 0.0;
+        for (int i = 0; i < 12; i++) {
+          float a = float(i) * 0.5236;
+          vec2 o = vec2(cos(a), sin(a)) * uTexel;
+          vec4 s1 = texture2D(uTex, vUv + o * 3.0);
+          vec4 s2 = texture2D(uTex, vUv + o * 7.0);
+          glow += s1.r * vis(s1.b) * 0.6 + s2.r * vis(s2.b) * 0.4;
+          spark += s1.r * hot(s1.b) * 0.6 + s2.r * hot(s2.b) * 0.4;
+        }
+        glow /= 12.0; spark /= 12.0;
+        vec2 d = (vUv - uLight.xy) / uRadius;
+        float light = uLight.z * exp(-dot(d, d));
+        float a = c.r * vis(c.b) * (0.84 + 0.16 * light) + c.r * hot(c.b) * 0.3 + spark * 1.8 + glow * light * 1.1;
+        a = clamp(a, 0.0, 1.0);
+        gl_FragColor = vec4(a, a, a, a);
+      }`;
+    const shader = (type, src) => {
+      const sh = gl.createShader(type);
+      gl.shaderSource(sh, src);
+      gl.compileShader(sh);
+      return gl.getShaderParameter(sh, gl.COMPILE_STATUS) ? sh : null;
+    };
+    const vs = shader(gl.VERTEX_SHADER, VERT), fs = shader(gl.FRAGMENT_SHADER, FRAG);
+    const prog = vs && fs && gl.createProgram();
+    if (!prog) return city;
+    gl.attachShader(prog, vs);
+    gl.attachShader(prog, fs);
+    gl.linkProgram(prog);
+    if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) return city;
+    gl.useProgram(prog);
+    hero.classList.add("is-gl");
+
+    const buf = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
+    const aPos = gl.getAttribLocation(prog, "aPos");
+    gl.enableVertexAttribArray(aPos);
+    gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
+    const u = (name) => gl.getUniformLocation(prog, name);
+    const uProgress = u("uProgress"), uLight = u("uLight"), uRadius = u("uRadius");
+    gl.uniform1i(u("uTex"), 0);
+
+    const resize = () => {
+      const w = canvas.clientWidth, h = canvas.clientHeight;
+      if (!w || !h) return;
+      const bw = Math.min(Math.round(w * Math.min(window.devicePixelRatio || 1, 2)), 2560);
+      canvas.width = bw;
+      canvas.height = Math.round((bw * h) / w);
+      // La luz es un círculo de ~200 px en pantalla
+      const r = Math.min(260, Math.max(150, innerWidth * 0.15));
+      gl.uniform2f(uRadius, r / w, r / h);
+      city.render();
+    };
+    let raf = 0;
+    const draw = () => {
+      raf = 0;
+      gl.viewport(0, 0, canvas.width, canvas.height);
+      gl.clearColor(0, 0, 0, 0);
+      gl.clear(gl.COLOR_BUFFER_BIT);
+      gl.uniform1f(uProgress, city.progress);
+      gl.uniform3f(uLight, city.light.x, city.light.y, city.light.s);
+      gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+    };
+    city.render = () => { if (city.ready && !raf) raf = requestAnimationFrame(draw); };
+    city.whenReady = (fn) => (city.ready ? fn() : waiting.push(fn));
+
+    const img = new Image();
+    img.onload = () => {
+      try {
+        const tex = gl.createTexture();
+        gl.bindTexture(gl.TEXTURE_2D, tex);
+        gl.pixelStorei(gl.UNPACK_COLORSPACE_CONVERSION_WEBGL, gl.NONE);
+        gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, img);
+        [gl.TEXTURE_WRAP_S, gl.TEXTURE_WRAP_T].forEach((p) => gl.texParameteri(gl.TEXTURE_2D, p, gl.CLAMP_TO_EDGE));
+        [gl.TEXTURE_MIN_FILTER, gl.TEXTURE_MAG_FILTER].forEach((p) => gl.texParameteri(gl.TEXTURE_2D, p, gl.LINEAR));
+        gl.uniform2f(u("uTexel"), 1 / img.naturalWidth, 1 / img.naturalHeight);
+        if (gl.getError() !== gl.NO_ERROR) throw new Error("textura");
+      } catch (e) {
+        // Por ejemplo, abriendo index.html como archivo: el navegador no deja leer la imagen
+        fail();
+        return;
+      }
+      city.ready = true;
+      resize();
+      waiting.splice(0).forEach((fn) => fn());
+    };
+    img.onerror = fail;
+    img.src = "assets/portada/ciudad.webp";
+    window.addEventListener("resize", resize);
+    canvas.addEventListener("webglcontextlost", fail);
+    return city;
+  })();
+
   /* ---------- Menú y cursor según el fondo ---------- */
   // Sobre fondo blanco se ven naranjas; sobre naranja o fotos, blancos.
   const isWhiteAt = (x, y) => {
@@ -317,17 +444,6 @@
     duty: [typeLabel("duty"), T("cap.duty", { airports: T(countOf("duty") === 1 ? "cap.duty.one" : "cap.duty.many", { names: joinList(ofType("duty").map(airportName)) }) })],
   });
   let CAPTIONS = buildCaptions();
-
-  // Leyenda: el inventario completo (en el mapa filtrado se resalta el tipo activo)
-  let legendItems = [], legendNums = [];
-  const renderLegend = () => {
-    $("#covLegend").innerHTML = ORDER.filter(countOf)
-      .map((t) => `<li data-type="${t}"><i class="shape shape-${t}"></i>${typeLabel(t)}<span data-n="${countOf(t)}">0</span></li>`)
-      .join("");
-    legendItems = $$("#covLegend li");
-    legendNums = $$("#covLegend span");
-  };
-  renderLegend();
 
   // Resumen simplificado de un departamento (opcionalmente, de un solo tipo)
   const summaryHTML = (list, onlyType) =>
@@ -557,8 +673,6 @@
       const on = !!filter && m.site.type === filter;
       if (on !== m.shown) { m.shown = on; m.el.classList.toggle("show", on); m.el.tabIndex = on ? 0 : -1; }
     });
-    legendNums.forEach((el) => (el.textContent = el.dataset.n));
-    legendItems.forEach((li) => li.classList.toggle("on", !filter || li.dataset.type === filter));
     covReset.hidden = !filter;
     setCaption(...(filter ? CAPTIONS[filter] : CAPTIONS.hold));
   };
@@ -604,8 +718,6 @@
     const lit = Math.round(paint * supportDeps.length);
     supportDeps.forEach((path, i) => path.classList.toggle("lit", i < lit));
     covCount.textContent = lit;
-    legendNums.forEach((el) => (el.textContent = Math.round(+el.dataset.n * paint)));
-    legendItems.forEach((li) => li.classList.add("on"));
     if (p < 0.14) setCaption(...CAPTIONS.start);
     else setCaption(supportDeps.length ? supportDeps[Math.max(0, lit - 1)].dataset.name : CAPTIONS.start[0], CAPTIONS.paint, false);
   };
@@ -613,7 +725,6 @@
   // Al cambiar de idioma se rearman los textos del mapa
   onLang(() => {
     CAPTIONS = buildCaptions();
-    renderLegend();
     markers.forEach((m) => m.el.setAttribute("aria-label", markerAria(m.site)));
     routeLabels.forEach((l) => (l.el.firstChild.textContent = routeLabelText(l.route)));
     const target = camFor(filter);
@@ -676,6 +787,8 @@
     $("#loader").remove();
     document.body.classList.remove("is-loading");
     $$(".fade-in").forEach((el) => (el.style.opacity = 1));
+    heroCity.progress = 1.15;
+    heroCity.whenReady(heroCity.render);
     aboutWords.forEach((words) => { words.lastN = Infinity; words.forEach((w) => w.classList.add("on")); });
     $$("[data-count]").forEach(countUp);
     $$(".sc-slide").forEach((s) => (s.style.clipPath = "none"));
@@ -724,12 +837,24 @@
   frames.forEach((img, i) => {
     intro.add(() => { frames.forEach((f) => f.classList.remove("on")); img.classList.add("on"); }, i === 0 ? ">" : `>${STEP}`);
   });
+  // Al abrirse la portada: el logo sube desde el centro, la ciudad se dibuja y el 30 sale por detrás
+  const revealHero = () => {
+    const logo = $(".hero-logo");
+    const r = logo.getBoundingClientRect();
+    gsap.from(logo, { y: innerHeight / 2 - (r.top + r.height / 2), duration: 1.3, ease: "expo.inOut" });
+    if ($(".hero").classList.contains("is-gl")) {
+      heroCity.whenReady(() => gsap.to(heroCity, { progress: 1.15, duration: reduceMotion ? 0 : 2.8, ease: "power1.inOut", onUpdate: heroCity.render }));
+    } else {
+      gsap.from(".hero-lines", { opacity: 0, duration: 1.6, ease: "power2.out" });
+    }
+    gsap.from(".hero-num", { yPercent: 50, opacity: 0, duration: 2.2, delay: reduceMotion ? 0 : 1.3, ease: "expo.out" });
+  };
   intro
     .to(".loader-final", { opacity: 1, duration: 0.25 }, `>${STEP}`)
     .to(box, { width: () => innerWidth, height: () => innerHeight, duration: 1.2, ease: "expo.inOut" }, ">0.15")
     .add(finishLoading)
-    .from(".hero-num", { opacity: 0, scale: 1.2, filter: "blur(40px)", duration: 1.8, ease: "expo.out" }, "<")
-    .to(".fade-in", { opacity: 1, duration: 1, stagger: 0.08 }, "<0.3");
+    .add(revealHero)
+    .to(".fade-in", { opacity: 1, duration: 1, stagger: 0.08 }, "<1.2");
 
   /* ---------- Cursor ---------- */
   const cursor = $("#cursor");
@@ -760,27 +885,50 @@
   $$(".g-item").forEach((el) => bindCursor(el, "view"));
   mapRows.forEach((el) => bindCursor(el, "map"));
 
-  /* ---------- Hero: luz que sigue al mouse ---------- */
+  /* ---------- Portada: luz que sigue al mouse ---------- */
+  // La misma luz ilumina el 30 y las líneas de la ciudad
   const heroNum = $(".hero-num");
+  const heroCanvas = $("#heroCanvas");
+  const light = { x: innerWidth * 0.3, y: innerHeight * 0.3 };
+  const applyLight = () => {
+    const n = heroNum.getBoundingClientRect();
+    heroNum.style.setProperty("--x", `${((light.x - n.left) / n.width) * 100}%`);
+    heroNum.style.setProperty("--y", `${((light.y - n.top) / n.height) * 100}%`);
+    const c = heroCanvas.getBoundingClientRect();
+    heroCity.light.x = (light.x - c.left) / c.width;
+    heroCity.light.y = (light.y - c.top) / c.height;
+    heroCity.render();
+  };
+  if (!reduceMotion) heroCity.light.s = 1;
+  applyLight();
   if (finePointer && !reduceMotion) {
-    const light = { x: 30, y: 20 };
+    // El 30 está más lejos: se corre un poco al revés del mouse
+    const numX = gsap.quickTo(".hero-glow", "x", { duration: 1.4, ease: "power3.out" });
+    const numY = gsap.quickTo(".hero-glow", "y", { duration: 1.4, ease: "power3.out" });
     $(".hero").addEventListener("pointermove", (e) => {
-      gsap.to(light, {
-        x: (e.clientX / innerWidth) * 100,
-        y: (e.clientY / innerHeight) * 100,
-        duration: 1.2,
-        ease: "power3.out",
-        onUpdate: () => { heroNum.style.setProperty("--x", `${light.x}%`); heroNum.style.setProperty("--y", `${light.y}%`); },
-      });
+      gsap.to(light, { x: e.clientX, y: e.clientY, duration: 1.2, ease: "power3.out", overwrite: true, onUpdate: applyLight });
+      numX((0.5 - e.clientX / innerWidth) * 36);
+      numY((0.5 - e.clientY / innerHeight) * 18);
     });
   } else if (!reduceMotion) {
-    gsap.to({ t: 0 }, {
-      t: Math.PI * 2, duration: 10, repeat: -1, ease: "none",
-      onUpdate() { const t = this.targets()[0].t; heroNum.style.setProperty("--x", `${50 + Math.cos(t) * 35}%`); heroNum.style.setProperty("--y", `${40 + Math.sin(t) * 30}%`); },
+    // En pantallas táctiles la luz recorre la portada sola (solo mientras se ve)
+    const orbit = gsap.to({ t: 0 }, {
+      t: Math.PI * 2, duration: 12, repeat: -1, ease: "none",
+      onUpdate() {
+        const t = this.targets()[0].t, h = $(".hero").offsetHeight;
+        light.x = innerWidth * (0.5 + Math.cos(t) * 0.42);
+        light.y = h * (0.66 + Math.sin(t) * 0.16);
+        applyLight();
+      },
     });
+    ScrollTrigger.create({ trigger: ".hero", start: "top top", end: "bottom top", onToggle: (st) => orbit.paused(!st.isActive) });
   }
-  gsap.to(".hero-glow", { scale: 0.85, opacity: 0, ease: "none", scrollTrigger: { trigger: ".hero", start: "top top", end: "bottom top", scrub: true } });
-  gsap.to(".hero-logo", { yPercent: -120, ease: "none", scrollTrigger: { trigger: ".hero", start: "top top", end: "bottom top", scrub: true } });
+  window.addEventListener("resize", applyLight);
+  // Al bajar: la ciudad se acerca (como entrando por la ruta), el 30 se esconde detrás y el logo sube
+  const heroOut = { trigger: ".hero", start: "top top", end: "bottom top", scrub: true };
+  gsap.to(".hero-city", { scale: 1.14, transformOrigin: "50% 74%", ease: "none", scrollTrigger: { ...heroOut } });
+  gsap.to(".hero-glow", { yPercent: 24, ease: "none", scrollTrigger: { ...heroOut } });
+  gsap.to(".hero-logo", { yPercent: -120, ease: "none", scrollTrigger: { ...heroOut } });
 
   /* ---------- Sobre nosotros: palabras que se encienden ---------- */
   aboutWords.forEach((words) => {

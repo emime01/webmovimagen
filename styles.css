@@ -65,23 +65,34 @@ body.on-white .nav { color: var(--orange); }
 .nav a:hover::after { transform: scaleX(1); transform-origin: left; }
 
 /* ---------- Hero ---------- */
-.hero { position: relative; height: 100svh; min-height: 560px; display: grid; place-items: center; overflow: hidden; }
-.hero-glow { position: absolute; inset: 0; display: grid; place-items: center; pointer-events: none; }
+/* Abajo, la ciudad ilustrada a todo el ancho; arriba, en el cielo, el logo y los textos.
+   El 30 asoma por detrás de los edificios (la silueta de la ciudad lo tapa). */
+.hero { --city-w: 100vw; --city-h: calc(var(--city-w) * 0.27); position: relative; height: 100svh; min-height: 560px; overflow: hidden; }
+.hero-glow { position: absolute; left: 0; right: 0; bottom: calc(var(--city-h) * 0.44); display: flex; justify-content: center; pointer-events: none; }
 .hero-num {
   --x: 30%; --y: 20%;
-  font-size: min(70vw, 110vh); font-weight: 500; letter-spacing: -0.08em; line-height: 0.8;
+  display: block; font-size: min(38vw, 56vh); font-weight: 500; letter-spacing: -0.08em; line-height: 0.8;
   color: transparent;
-  background: radial-gradient(circle at var(--x) var(--y), #fff 0%, rgba(255,255,255,0.75) 12%, rgba(255,255,255,0.18) 38%, rgba(255,255,255,0.06) 62%);
+  background: radial-gradient(circle at var(--x) var(--y), rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.55) 14%, rgba(255,255,255,0.14) 40%, rgba(255,255,255,0.05) 64%);
   -webkit-background-clip: text; background-clip: text;
-  filter: blur(6px);
-  transform: translate(-2%, 4%);
+  filter: blur(5px);
+  margin-right: -0.08em;
 }
-.hero-logo { position: relative; z-index: 2; }
+.hero-city { position: absolute; bottom: 0; left: calc(50% - var(--city-w) / 2); width: var(--city-w); aspect-ratio: 2000 / 540; pointer-events: none; }
+.hero-sil, .hero-lines, .hero-canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.hero-sil path { fill: var(--orange); }
+.hero-lines { overflow: visible; }
+.hero.is-gl .hero-lines { visibility: hidden; }
+.hero-sky {
+  position: absolute; left: 0; right: 0; top: 0; bottom: var(--city-h);
+  display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; align-content: center; column-gap: 24px;
+  padding: 56px var(--gutter) calc(var(--city-h) * 0.3 + 6vh);
+}
+.hero-logo { position: relative; z-index: 2; grid-column: 2; grid-row: 1; }
 .hero-logo img { width: clamp(150px, 16vw, 240px); }
-.hero-side { position: absolute; top: 50%; transform: translateY(-50%); font-size: 13px; font-weight: 500; z-index: 2; }
-.hero-left { left: var(--gutter); }
-.hero-right { right: var(--gutter); text-align: right; }
-.hero-foot { position: absolute; left: var(--gutter); right: var(--gutter); bottom: 22px; display: flex; justify-content: space-between; font-size: 12px; font-weight: 500; z-index: 2; }
+.hero-side { position: relative; z-index: 2; grid-row: 1; font-size: 13px; font-weight: 500; }
+.hero-left { grid-column: 1; }
+.hero-right { grid-column: 3; text-align: right; }
 
 /* ---------- Sobre nosotros ---------- */
 .about { padding: 22vh var(--gutter) 18vh; }
@@ -177,10 +188,6 @@ body.on-white .nav { color: var(--orange); }
 .cov-reset::after { content: " ×"; }
 .cov-reset:hover { background: var(--orange); color: var(--white); }
 .cov-credit { position: absolute; right: 6px; bottom: 2px; font-size: 9px; font-weight: 500; opacity: 0.6; pointer-events: none; }
-.cov-legend { list-style: none; display: grid; grid-template-columns: 1fr 1fr; gap: 10px 20px; margin-top: auto; padding-top: 20px; font-size: 13px; font-weight: 600; }
-.cov-legend li { display: flex; align-items: center; gap: 10px; transition: opacity 0.4s; }
-.coverage.is-filtered .cov-legend li:not(.on) { opacity: 0.3; }
-.cov-legend span { font-weight: 500; opacity: 0.6; font-variant-numeric: tabular-nums; }
 .shape { flex-shrink: 0; background: var(--orange); }
 .shape-rutero { width: 16px; height: 4px; border-radius: 2px; }
 .shape-shopping { width: 16px; height: 16px; border-radius: 50%; }
@@ -351,7 +358,7 @@ body.on-white .nav { color: var(--orange); }
 
 /* ---------- Etiquetas y selector de idioma ---------- */
 /* Las etiquetas cortas van en mayúsculas chicas con aire (reemplazan a los paréntesis) */
-.nav a, .lang, .label, .cov-stat span, .circle-label, .p-cat, .f-label, .cc-tag, .hero-foot,
+.nav a, .lang, .label, .cov-stat span, .circle-label, .p-cat, .f-label, .cc-tag,
 .products-intro > span, .products-head > span, .projects-head > span, .clients-head > span {
   text-transform: uppercase; letter-spacing: 0.1em; font-size: 11px; font-weight: 600;
 }
@@ -365,8 +372,13 @@ body.on-white .nav { color: var(--orange); }
   .nav { font-size: 11px; }
   .nav a, .lang { letter-spacing: 0.05em; font-size: 10.5px; }
   .nav a:nth-child(4), .nav a:nth-child(5) { display: none; }
-  .hero-num { font-size: 112vw; }
-  .hero-side { top: auto; bottom: 80px; transform: none; font-size: 12px; }
+  .hero { --city-w: 270vw; }
+  .hero-num { font-size: 88vw; }
+  .hero-sky { grid-template-columns: 1fr 1fr; grid-template-rows: auto 1fr; align-content: stretch; column-gap: 12px; padding-top: 76px; padding-bottom: calc(var(--city-h) * 0.25 + 16vh); }
+  .hero-logo { grid-column: 1 / -1; grid-row: 2; justify-self: center; }
+  .hero-side { font-size: 12px; align-self: start; }
+  .hero-left { grid-column: 1; }
+  .hero-right { grid-column: 2; }
   .about-text { text-indent: 0; }
   .circles { width: 86vw; }
   .circle-label { display: none; }
@@ -380,7 +392,7 @@ body.on-white .nav { color: var(--orange); }
   .showcase { height: 360vh; }
   .sc-caption { bottom: 56px; }
   .coverage { height: 230vh; }
-  .cov-sticky { grid-template-columns: 1fr; grid-template-rows: auto auto auto minmax(0, 1fr) auto; row-gap: 10px; padding: 54px var(--gutter) 16px; }
+  .cov-sticky { grid-template-columns: 1fr; grid-template-rows: auto auto auto minmax(0, 1fr); row-gap: 10px; padding: 54px var(--gutter) 16px; }
   .cov-info { display: contents; }
   .cov-info .label { order: 1; }
   .cov-stats { order: 2; margin-top: 0; grid-template-columns: repeat(4, 1fr); }
@@ -391,7 +403,6 @@ body.on-white .nav { color: var(--orange); }
   .cov-zone { font-size: 20px; }
   .cov-text { margin-top: 4px; font-size: 12px; }
   .cov-map { order: 4; height: 100%; width: auto; min-height: 0; align-self: center; }
-  .cov-legend { order: 5; margin-top: 0; padding-top: 4px; gap: 6px 14px; font-size: 11px; }
   .cov-card { max-width: 250px; }
   .form { grid-template-columns: 1fr; }
   .field.full, .submit, .form-note { grid-column: auto; }
