@@ -67,19 +67,21 @@ body.on-white .nav { color: var(--orange); }
 /* ---------- Hero ---------- */
 /* Abajo, la ciudad ilustrada (la ruta se corta un poco en el borde); arriba, en el cielo, el logo
    y los textos. El 30 asoma por detrás de los edificios (la silueta de la ciudad lo tapa). */
-.hero { --city-w: min(100vw, 150svh); --city-h: calc(var(--city-w) * 0.436); position: relative; height: 100svh; min-height: 560px; overflow: hidden; }
-.hero-glow { position: absolute; left: 0; right: 0; bottom: calc(var(--city-h) * 0.54); display: flex; justify-content: center; pointer-events: none; }
+.hero { --city-w: min(112vw, 190svh); --city-h: calc(var(--city-w) * 0.436); position: relative; height: 100svh; min-height: 560px; overflow: hidden; }
+.hero-glow { position: absolute; left: 0; right: 0; bottom: calc(var(--city-h) * 0.73); display: flex; justify-content: center; pointer-events: none; }
 .hero-num {
   --x: 30%; --y: 20%;
-  display: block; font-size: min(32vw, 44vh); font-weight: 500; letter-spacing: -0.08em; line-height: 0.8;
+  display: block; font-size: min(17vw, 24vh); white-space: nowrap; font-weight: 500; letter-spacing: -0.08em; line-height: 0.8;
   color: transparent;
-  background: radial-gradient(circle at var(--x) var(--y), rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.55) 14%, rgba(255,255,255,0.14) 40%, rgba(255,255,255,0.05) 64%);
+  background: radial-gradient(circle at var(--x) var(--y), rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.6) 16%, rgba(255,255,255,0.24) 42%, rgba(255,255,255,0.13) 70%);
   -webkit-background-clip: text; background-clip: text;
-  filter: blur(5px);
+  filter: blur(3px);
   margin-right: -0.08em;
 }
+/* "años" chico arriba a la derecha del +30, para que no quede tapado por la ciudad */
+.hero-num small { display: inline-block; vertical-align: top; margin: 0.06em 0 0 0.1em; font-size: 0.26em; letter-spacing: -0.04em; line-height: 1; }
 .hero-city {
-  position: absolute; bottom: calc(var(--city-h) * -0.12); left: calc(50% - var(--city-w) / 2);
+  position: absolute; bottom: calc(var(--city-h) * -0.1); left: calc(50% - var(--city-w) / 2);
   width: var(--city-w); aspect-ratio: 2000 / 872; pointer-events: none;
   -webkit-mask-image: linear-gradient(to right, transparent, #000 4%, #000 96%, transparent);
   mask-image: linear-gradient(to right, transparent, #000 4%, #000 96%, transparent);
@@ -378,8 +380,8 @@ body.on-white .nav { color: var(--orange); }
   .nav { font-size: 11px; }
   .nav a, .lang { letter-spacing: 0.05em; font-size: 10.5px; }
   .nav a:nth-child(4), .nav a:nth-child(5) { display: none; }
-  .hero { --city-w: 235vw; }
-  .hero-num { font-size: 80vw; }
+  .hero { --city-w: 280vw; }
+  .hero-num { font-size: 42vw; }
   .hero-sky { grid-template-columns: 1fr 1fr; row-gap: 11vh; column-gap: 12px; padding-top: 76px; }
   .hero-logo { grid-column: 1 / -1; grid-row: 2; justify-self: center; }
   .hero-side { font-size: 12px; }
