@@ -1,11 +1,14 @@
-// Prepara la ilustración de la portada (tools/portada-original.webp: líneas blancas sobre naranja).
+// Prepara la ilustración de la portada (tools/portada-original.webp: líneas blancas sobre fondo
+// transparente).
 //
 // Escribe:
 //  - ../assets/portada/ciudad.webp (sin pérdida): rojo = líneas; azul = momento en que se dibuja
-//    cada línea (0 al empezar, 255 al final). El dibujo arranca en el centro de la ruta y avanza
+//    cada punto (0 al empezar, 255 al final). El dibujo arranca en el centro de la ruta y avanza
 //    siguiendo los trazos. main.js lo pinta con WebGL; sin WebGL, un filtro SVG muestra el rojo.
 //  - silueta.txt: el contorno de la ciudad para el <path class="hero-sil"> de index.html
 //    (tapa la parte del 30 que queda detrás de los edificios).
+// Al terminar muestra el tamaño del recorte: si cambia, hay que actualizar el viewBox y el
+// aspect-ratio de .hero-city (index.html y styles.css).
 //
 // Uso (desde la carpeta tools/):
 //   npm i sharp
@@ -13,24 +16,26 @@
 import fs from 'fs';
 import sharp from 'sharp';
 
-const { data, info } = await sharp('portada-original.webp').raw().toBuffer({ resolveWithObject: true });
-const W = info.width, C = info.channels;
-// Solo la parte de la ciudad: el cielo de arriba queda vacío
-const Y0 = 505, H = info.height - Y0, N = W * H;
-
-// Líneas: cuánto blanco hay en cada píxel (el fondo es naranja parejo, con algo de ruido)
-const A = new Float32Array(N);
-for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
-  const i = ((y + Y0) * W + x) * C;
-  const byBlue = (data[i + 2] - 22) / 228, byGreen = (data[i + 1] - 96) / 154;
-  A[y * W + x] = Math.max(0, Math.min(1, (byBlue + byGreen) / 2));
+const { data, info } = await sharp('portada-original.webp').ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+const W = info.width, H0 = info.height;
+// Líneas: cuánto blanco opaco hay en cada píxel
+const full = new Float32Array(W * H0);
+for (let i = 0; i < W * H0; i++) {
+  const lum = (data[i * 4] + data[i * 4 + 1] + data[i * 4 + 2]) / 765;
+  full[i] = (data[i * 4 + 3] / 255) * lum;
 }
+// Solo la franja con dibujo (el resto es cielo vacío), con un margen para el brillo
+let firstY = H0, lastY = 0;
+for (let y = 0; y < H0; y++) for (let x = 0; x < W; x++) if (full[y * W + x] > 0.3) { firstY = Math.min(firstY, y); lastY = Math.max(lastY, y); }
+const Y0 = Math.max(0, firstY - 16), H = Math.min(H0, lastY + 12) - Y0, N = W * H;
+const A = full.subarray(Y0 * W, (Y0 + H) * W);
 
 // Orden del dibujo: distancia desde el centro de la ruta caminando por las líneas
 // (cruzar fondo cuesta mucho más, así el trazo sigue los dibujos)
-const SEED = [1000, 905];
-const dist = new Float32Array(N).fill(Infinity);
-const heapI = new Int32Array(N * 4), heapD = new Float32Array(N * 4);
+const SEED = [1000, 800]; // en la imagen original
+const dist = new Float64Array(N).fill(Infinity);
+// Cada píxel puede entrar varias veces a la cola (hasta una por vecino)
+const heapI = new Int32Array(N * 8), heapD = new Float64Array(N * 8);
 let hn = 0;
 const swap = (p, q) => { const i = heapI[p], d = heapD[p]; heapI[p] = heapI[q]; heapD[p] = heapD[q]; heapI[q] = i; heapD[q] = d; };
 const push = (i, d) => {
@@ -93,4 +98,4 @@ let d = `M0 ${H}`;
 for (let x = 0; x <= W; x += 8) d += `L${x} ${Math.round(sil[Math.min(W - 1, x)] + 3)}`;
 d += `L${W} ${H}Z`;
 fs.writeFileSync('silueta.txt', d + '\n');
-console.log(`ciudad ${W}x${H} (desde y=${Y0}); silueta ${d.length} caracteres`);
+console.log(`ciudad ${W}x${H} (desde y=${Y0}), proporción ${(W / H).toFixed(4)}; silueta ${d.length} caracteres`);
