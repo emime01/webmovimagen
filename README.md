@@ -10,13 +10,14 @@ python3 -m http.server 8000
 ```
 
 ## Secciones
-Inspirada en ghuynguyen.vercel.app, con el contenido de la web actual de Movimagen:
+Inspirada en ghuynguyen.vercel.app, con el contenido de la web actual de Movimagen. Colores de marca: naranja #EB691C y blanco. Fuente: Montserrat.
 
-1. Portada: "30" con luz que sigue al mouse, precargador con contador
+1. Carga: ventana con fotos de campañas que se agranda hasta ser la portada
+   Portada: "30" con luz que sigue al mouse
 2. Sobre nosotros: texto que se ilumina palabra por palabra al hacer scroll
 3. Valores: confianza, flexibilidad y cercanía, con fotos de campañas flotando
 4. Números: 30 años, 50+ soportes, 19 departamentos, 5 terminales
-5. Productos: Buses, Shoppings, Pantallas gigantes, Walls, Duty Select y Ruteros, con foto al pasar el mouse
+5. Productos: filas con nombre grande centrado (Buses, Shoppings, Pantallas gigantes, Walls, Duty Select, Ruteros) y ventana que se abre y pasa fotos al hacer scroll
 6. Proyectos: foto que se abre al hacer scroll y galería horizontal
 7. Testimonios en carrusel
 8. Clientes: logos en movimiento

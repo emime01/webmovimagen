@@ -5,26 +5,34 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Movimagen | Publicidad exterior</title>
   <meta name="description" content="Más de 30 años conectando marcas con personas. Buses, shoppings, pantallas gigantes, walls, duty select y ruteros en todo Uruguay." />
-  <meta name="theme-color" content="#0a0a0a" />
+  <meta name="theme-color" content="#eb691c" />
   <link rel="icon" href="assets/logo-color.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body class="is-loading">
 
-  <!-- Preloader -->
+  <!-- Carga: ventana con fotos que se agranda hasta ser la portada -->
   <div class="loader" id="loader" aria-hidden="true">
-    <img src="assets/logo-blanco.png" alt="" class="loader-logo" />
-    <span class="loader-count" id="loaderCount">0</span>
+    <div class="loader-box" id="loaderBox">
+      <img src="assets/hero/home.jpg" alt="" />
+      <img src="assets/proyectos/polar.png" alt="" />
+      <img src="assets/hero/9691.jpg" alt="" />
+      <img src="assets/proyectos/ucu.png" alt="" />
+      <img src="assets/hero/9692.jpg" alt="" />
+      <img src="assets/proyectos/bauducco.png" alt="" />
+      <img src="assets/hero/9693.jpg" alt="" />
+      <img src="assets/proyectos/proyecto.png" alt="" />
+      <div class="loader-final"></div>
+      <img src="assets/logo-blanco.png" alt="" class="loader-logo" />
+    </div>
   </div>
 
-  <!-- Cursor -->
   <div class="cursor" id="cursor" aria-hidden="true"><span id="cursorLabel"></span></div>
 
-  <!-- Nav -->
-  <header class="nav">
+  <header class="nav" id="nav">
     <a href="#somos">(Somos)</a>
     <a href="#productos">(Productos)</a>
     <a href="#proyectos">(Proyectos)</a>
@@ -34,13 +42,9 @@
 
   <main>
     <!-- HERO -->
-    <section class="hero" id="inicio">
-      <div class="hero-glow" id="heroGlow" aria-hidden="true">
-        <span class="hero-num">30</span>
-      </div>
-      <h1 class="hero-logo">
-        <img src="assets/logo-blanco.png" alt="Movimagen" />
-      </h1>
+    <section class="hero theme-orange" id="inicio">
+      <div class="hero-glow" aria-hidden="true"><span class="hero-num">30</span></div>
+      <h1 class="hero-logo"><img src="assets/logo-blanco.png" alt="Movimagen" /></h1>
       <p class="hero-side hero-left fade-in">Publicidad exterior<br />en todo Uruguay.</p>
       <p class="hero-side hero-right fade-in">Más de 30 años conectando<br />marcas con personas.</p>
       <div class="hero-foot fade-in">
@@ -51,7 +55,7 @@
     </section>
 
     <!-- SOMOS -->
-    <section class="about" id="somos">
+    <section class="about theme-white" id="somos">
       <p class="label">(Sobre nosotros)</p>
       <p class="about-text" data-words>
         En Movimagen llevamos más de 30 años acompañando a las marcas a conectar con las personas, a través de un portafolio con más de 50 tipos de soportes y presencia en todo el país.
@@ -61,16 +65,16 @@
       </p>
     </section>
 
-    <!-- VALORES: círculos + imágenes flotantes -->
-    <section class="values" id="valores">
+    <!-- VALORES -->
+    <section class="values theme-orange" id="valores">
       <div class="values-sticky">
         <svg class="circles" viewBox="0 0 700 680" aria-hidden="true">
           <circle cx="350" cy="225" r="225" />
           <circle cx="225" cy="455" r="225" />
           <circle cx="475" cy="455" r="225" />
-          <circle class="dot" r="3.5"><animateMotion dur="14s" repeatCount="indefinite" path="M350,0 a225,225 0 1,1 -0.1,0" /></circle>
-          <circle class="dot" r="3.5"><animateMotion dur="18s" repeatCount="indefinite" path="M0,455 a225,225 0 1,0 450,0 a225,225 0 1,0 -450,0" /></circle>
-          <circle class="dot" r="3.5"><animateMotion dur="16s" repeatCount="indefinite" path="M700,455 a225,225 0 1,1 -450,0 a225,225 0 1,1 450,0" /></circle>
+          <circle class="dot" r="4"><animateMotion dur="14s" repeatCount="indefinite" path="M350,0 a225,225 0 1,1 -0.1,0" /></circle>
+          <circle class="dot" r="4"><animateMotion dur="18s" repeatCount="indefinite" path="M0,455 a225,225 0 1,0 450,0 a225,225 0 1,0 -450,0" /></circle>
+          <circle class="dot" r="4"><animateMotion dur="16s" repeatCount="indefinite" path="M700,455 a225,225 0 1,1 -450,0 a225,225 0 1,1 450,0" /></circle>
         </svg>
         <span class="circle-label cl-1">Confianza</span>
         <span class="circle-label cl-2">Flexibilidad</span>
@@ -88,7 +92,7 @@
     </section>
 
     <!-- NÚMEROS -->
-    <section class="stats">
+    <section class="stats theme-white">
       <div class="stat"><strong data-count="30">0</strong><span>(Años de experiencia)</span></div>
       <div class="stat"><strong data-count="50" data-suffix="+">0</strong><span>(Tipos de soportes)</span></div>
       <div class="stat"><strong data-count="19">0</strong><span>(Departamentos)</span></div>
@@ -96,71 +100,76 @@
     </section>
 
     <!-- PRODUCTOS -->
-    <section class="products" id="productos">
+    <section class="products theme-white" id="productos">
       <div class="big-marquee" aria-hidden="true">
         <div class="bm-row bm-1"><span>Productos</span><i></i><span>Productos</span><i></i><span>Productos</span><i></i><span>Productos</span><i></i></div>
         <div class="bm-row bm-2"><span>Soportes</span><i></i><span>Soportes</span><i></i><span>Soportes</span><i></i><span>Soportes</span><i></i></div>
       </div>
-      <p class="products-intro">Cada soporte es una palanca: juntos hacen que tu campaña llegue más lejos.</p>
+
+      <div class="products-intro">
+        <span>(Formato)</span>
+        <p>Cada soporte es una palanca: juntos hacen que tu marca llegue a todo el país.</p>
+        <span>(Alcance)</span>
+      </div>
+
       <ul class="product-list" id="productList">
-        <li data-img="assets/proyectos/bauducco.png">
-          <span class="p-num">(01)</span><h3>Buses</h3><p>Publicidad en buses urbanos e interdepartamentales.</p><span class="p-arrow">→</span>
-          <img src="assets/proyectos/bauducco.png" alt="" class="p-thumb" loading="lazy" />
-        </li>
-        <li data-img="assets/proyectos/proyecto.png">
-          <span class="p-num">(02)</span><h3>Shoppings</h3><p>Publicidad estática y circuitos de pantallas en shoppings del interior.</p><span class="p-arrow">→</span>
-          <img src="assets/proyectos/proyecto.png" alt="" class="p-thumb" loading="lazy" />
-        </li>
-        <li data-img="assets/proyectos/gatorade.png">
-          <span class="p-num">(03)</span><h3>Pantallas gigantes</h3><p>Publicidad en LEDs gigantes en puntos estratégicos de la vía pública.</p><span class="p-arrow">→</span>
-          <img src="assets/proyectos/gatorade.png" alt="" class="p-thumb" loading="lazy" />
-        </li>
-        <li data-img="assets/hero/9691.jpg">
-          <span class="p-num">(04)</span><h3>Walls</h3><p>Av. Italia y Caldas · Av. José Batlle y Ordoñez y Av. Rivera · Av. 18 de Julio y Roxlo.</p><span class="p-arrow">→</span>
-          <img src="assets/hero/9691.jpg" alt="" class="p-thumb" loading="lazy" />
-        </li>
-        <li data-img="assets/video.jpg">
-          <span class="p-num">(05)</span><h3>Duty Select</h3><p>Circuito de pantallas en los free shops de los aeropuertos de Carrasco y Punta del Este.</p><span class="p-arrow">→</span>
-          <img src="assets/video.jpg" alt="" class="p-thumb" loading="lazy" />
-        </li>
-        <li data-img="assets/hero/home.jpg">
-          <span class="p-num">(06)</span><h3>Ruteros</h3><p>Carteles de gran formato sobre rutas y accesos estratégicos.</p><span class="p-arrow">→</span>
-          <img src="assets/hero/home.jpg" alt="" class="p-thumb" loading="lazy" />
-        </li>
+        <li data-img="assets/proyectos/bauducco.png"><span class="p-cat">Movilidad</span><h3>Buses</h3><span class="p-meta">(Urbanos)-(Interdepartamentales)</span></li>
+        <li data-img="assets/proyectos/proyecto.png"><span class="p-cat">Retail</span><h3>Shoppings</h3><span class="p-meta">(Estático)-(Pantallas)</span></li>
+        <li data-img="assets/hero/9692.jpg"><span class="p-cat">Vía pública</span><h3>Pantallas gigantes</h3><span class="p-meta">(LED)</span></li>
+        <li data-img="assets/hero/9691.jpg"><span class="p-cat">Gran formato</span><h3>Walls</h3><span class="p-meta">(Av. Italia)-(Rivera)-(18 de Julio)</span></li>
+        <li data-img="assets/video.jpg"><span class="p-cat">Aeropuertos</span><h3>Duty Select</h3><span class="p-meta">(Carrasco)-(Punta del Este)</span></li>
+        <li data-img="assets/hero/home.jpg"><span class="p-cat">Rutas</span><h3>Ruteros</h3><span class="p-meta">(Accesos estratégicos)</span></li>
       </ul>
       <img class="hover-img" id="hoverImg" alt="" aria-hidden="true" />
-    </section>
 
-    <!-- PROYECTOS -->
-    <section class="projects" id="projects-intro">
-      <div class="projects-head" id="proyectos">
-        <span>Últimos</span>
-        <h2>Campañas que hicieron<br />mirar a la ciudad</h2>
-        <span>Proyectos</span>
+      <div class="products-head">
+        <span>(En la calle)</span>
+        <p>Soportes que la ciudad<br />mira todos los días</p>
+        <span>(Uruguay)</span>
       </div>
-      <div class="reveal-window" id="revealWindow">
-        <div class="rw-frame" id="rwFrame">
-          <img src="assets/hero/home.jpg" alt="Wall de Jetmar sobre la avenida, fotografiado al atardecer" />
+
+      <!-- Ventana que se abre y pasa fotos -->
+      <div class="showcase" id="showcase">
+        <div class="sc-sticky">
+          <div class="sc-frame" id="scFrame">
+            <figure class="sc-slide"><img src="assets/hero/home.jpg" alt="Wall de Jetmar sobre una avenida de Montevideo" /></figure>
+            <figure class="sc-slide"><img src="assets/hero/9691.jpg" alt="Wall publicitario en la esquina de un edificio de ladrillo" /></figure>
+            <figure class="sc-slide"><img src="assets/hero/9692.jpg" alt="Pantalla gigante de Conaprole sobre una avenida con tránsito" /></figure>
+            <figure class="sc-slide"><img src="assets/hero/9693.jpg" alt="Pantalla gigante sobre un local de comida en una esquina" /></figure>
+            <div class="sc-caption">
+              <span id="scName">Walls</span>
+              <span id="scIndex">(01/04)</span>
+            </div>
+            <div class="sc-bars" id="scBars"><i></i><i></i><i></i><i></i></div>
+          </div>
         </div>
       </div>
     </section>
 
-    <section class="gallery" id="gallery">
-      <div class="gallery-track" id="galleryTrack">
-        <article class="g-item"><img src="assets/proyectos/veocasas.png" alt="Campaña Veocasas" loading="lazy" /><h3>Veocasas</h3></article>
-        <article class="g-item"><img src="assets/proyectos/gatorade.png" alt="Campaña Gatorade - FNC" loading="lazy" /><h3>Gatorade — FNC</h3></article>
-        <article class="g-item"><img src="assets/proyectos/schneck.png" alt="Campaña Schneck" loading="lazy" /><h3>Schneck</h3></article>
-        <article class="g-item"><img src="assets/proyectos/conaprole.png" alt="Campaña Conaprole" loading="lazy" /><h3>Conaprole</h3></article>
-        <article class="g-item"><img src="assets/proyectos/ucu.png" alt="Campaña UCU" loading="lazy" /><h3>UCU</h3></article>
-        <article class="g-item"><img src="assets/proyectos/polar.png" alt="Campaña Polar Food - Conaprole" loading="lazy" /><h3>Polar Food — Conaprole</h3></article>
-        <article class="g-item"><img src="assets/proyectos/bauducco.png" alt="Campaña Bauducco" loading="lazy" /><h3>Bauducco</h3></article>
+    <!-- PROYECTOS -->
+    <section class="projects theme-orange" id="proyectos">
+      <div class="projects-head">
+        <span>(Últimos)</span>
+        <h2>Campañas que hicieron<br />mirar a la ciudad</h2>
+        <span>(Proyectos)</span>
+      </div>
+      <div class="gallery" id="gallery">
+        <div class="gallery-track" id="galleryTrack">
+          <article class="g-item"><img src="assets/proyectos/veocasas.png" alt="Campaña Veocasas" loading="lazy" /><h3>Veocasas</h3></article>
+          <article class="g-item"><img src="assets/proyectos/gatorade.png" alt="Campaña Gatorade - FNC" loading="lazy" /><h3>Gatorade — FNC</h3></article>
+          <article class="g-item"><img src="assets/proyectos/schneck.png" alt="Campaña Schneck" loading="lazy" /><h3>Schneck</h3></article>
+          <article class="g-item"><img src="assets/proyectos/conaprole.png" alt="Campaña Conaprole" loading="lazy" /><h3>Conaprole</h3></article>
+          <article class="g-item"><img src="assets/proyectos/ucu.png" alt="Campaña UCU" loading="lazy" /><h3>UCU</h3></article>
+          <article class="g-item"><img src="assets/proyectos/polar.png" alt="Campaña Polar Food - Conaprole" loading="lazy" /><h3>Polar Food — Conaprole</h3></article>
+          <article class="g-item"><img src="assets/proyectos/bauducco.png" alt="Campaña Bauducco" loading="lazy" /><h3>Bauducco</h3></article>
+        </div>
       </div>
     </section>
 
     <!-- TESTIMONIOS -->
-    <section class="testimonials" id="testimonios">
+    <section class="testimonials theme-white" id="testimonios">
       <p class="label">(¿Qué dicen nuestros clientes?)</p>
-      <div class="t-stage" id="tStage">
+      <div class="t-stage">
         <figure class="t-item active">
           <blockquote>“Desde Canarias elegimos Movimagen por dos razones: el entendimiento real de las necesidades del cliente y la flexibilidad en las propuestas.”</blockquote>
           <figcaption>Nelson Loira <span>— Canarias S.A.</span></figcaption>
@@ -190,7 +199,7 @@
     </section>
 
     <!-- CLIENTES -->
-    <section class="clients" id="clientes">
+    <section class="clients theme-orange" id="clientes">
       <div class="clients-head">
         <span>(Clientes)</span>
         <h2>Marcas que confían<br />en la calle</h2>
@@ -200,11 +209,9 @@
     </section>
 
     <!-- CONTACTO -->
-    <section class="contact" id="contacto">
+    <section class="contact theme-white" id="contacto">
       <p class="label">(Solicitá tu cotización)</p>
-      <a class="contact-big" href="mailto:info@movimagen.com" data-cursor="Escribinos">
-        <span>Hablemos</span>
-      </a>
+      <a class="contact-big" href="mailto:info@movimagen.com" data-cursor="Escribinos"><span>Hablemos</span></a>
       <form class="form" id="quoteForm">
         <div class="field"><label for="f-nombre">Nombre *</label><input id="f-nombre" name="nombre" required /></div>
         <div class="field"><label for="f-email">E-mail *</label><input id="f-email" name="email" type="email" required /></div>
@@ -222,8 +229,10 @@
         <button type="submit" class="submit" data-cursor="Enviar"><span>Enviar y solicitar propuesta</span><span>→</span></button>
         <p class="form-note" id="formNote"></p>
       </form>
+    </section>
 
-      <footer class="footer">
+    <footer class="footer theme-orange">
+      <div class="footer-grid">
         <div>
           <p class="f-label">(Dirección)</p>
           <p>Avenida Almirante Harwood 6411<br />Montevideo, Uruguay</p>
@@ -239,9 +248,9 @@
           <a href="https://twitter.com/Movimagen" target="_blank" rel="noopener">(Twitter)</a>
         </div>
         <p class="copy">© <span id="year"></span> Girarlor S.A.</p>
-      </footer>
-      <div class="footer-mark" aria-hidden="true"><img src="assets/logo-blanco.png" alt="" /></div>
-    </section>
+      </div>
+      <div class="footer-mark" aria-hidden="true">movimagen</div>
+    </footer>
   </main>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>

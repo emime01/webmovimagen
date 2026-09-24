@@ -20,13 +20,31 @@
 
   /* ---------- Logos de clientes ---------- */
   const LOGOS = Array.from({ length: 33 }, (_, i) => `assets/clientes/c${i + 1}.${i < 21 ? "png" : "jpg"}`);
-  const rows = [LOGOS.slice(0, 17), LOGOS.slice(17)];
-  $("#logoRows").innerHTML = rows
+  $("#logoRows").innerHTML = [LOGOS.slice(0, 17), LOGOS.slice(17)]
     .map((row, r) => {
       const chips = row.map((src) => `<div class="logo-chip"><img src="${src}" alt="Logo de cliente de Movimagen" loading="lazy" /></div>`).join("");
       return `<div class="logo-row${r ? " rev" : ""}">${chips}${chips.replace(/alt="[^"]*"/g, 'alt="" aria-hidden="true"')}</div>`;
     })
     .join("");
+
+  /* ---------- Menú y cursor según el fondo ---------- */
+  // Sobre fondo blanco se ven naranjas; sobre naranja o fotos, blancos.
+  const isWhiteAt = (x, y) => {
+    for (const el of document.elementsFromPoint(x, y)) {
+      if (el.closest(".nav, .cursor, .hover-img")) continue;
+      if (el.closest(".sc-frame, .loader")) return false;
+      if (el.closest(".theme-white")) return true;
+      if (el.closest(".theme-orange")) return false;
+    }
+    return false;
+  };
+  let themeQueued = false;
+  const updateTheme = () => {
+    themeQueued = false;
+    document.body.classList.toggle("on-white", isWhiteAt(innerWidth / 2, 30));
+  };
+  const queueTheme = () => { if (!themeQueued) { themeQueued = true; requestAnimationFrame(updateTheme); } };
+  window.addEventListener("scroll", queueTheme, { passive: true });
 
   /* ---------- Formulario ---------- */
   // Sin backend: arma el correo con todos los datos para info@movimagen.com
@@ -52,7 +70,7 @@
   const tBars = $("#tBars");
   tBars.innerHTML = tItems.map((_, i) => `<button aria-label="Testimonio ${i + 1}"><i></i></button>`).join("");
   const barFills = $$("i", tBars);
-  let tIndex = 0, tTimer, tStart;
+  let tIndex = 0, tStart = performance.now();
   const T_DURATION = 7000;
   const showTestimonial = (i) => {
     tIndex = (i + tItems.length) % tItems.length;
@@ -64,11 +82,11 @@
     const p = Math.min((now - tStart) / T_DURATION, 1);
     barFills[tIndex].style.width = `${p * 100}%`;
     if (p >= 1) showTestimonial(tIndex + 1);
-    tTimer = requestAnimationFrame(tickTestimonials);
+    requestAnimationFrame(tickTestimonials);
   };
   $$("button", tBars).forEach((b, i) => b.addEventListener("click", () => showTestimonial(i)));
   showTestimonial(0);
-  if (!reduceMotion) tTimer = requestAnimationFrame(tickTestimonials);
+  if (!reduceMotion) requestAnimationFrame(tickTestimonials);
 
   /* ---------- Contadores ---------- */
   const countUp = (el) => {
@@ -91,6 +109,8 @@
     $$(".fade-in").forEach((el) => (el.style.opacity = 1));
     aboutWords.flat().forEach((w) => w.classList.add("on"));
     $$("[data-count]").forEach(countUp);
+    $$(".sc-slide").forEach((s) => (s.style.clipPath = "none"));
+    updateTheme();
     return;
   }
 
@@ -100,7 +120,7 @@
   let lenis;
   if (!reduceMotion && typeof window.Lenis !== "undefined") {
     lenis = new Lenis({ lerp: 0.09 });
-    lenis.on("scroll", ScrollTrigger.update);
+    lenis.on("scroll", () => { ScrollTrigger.update(); queueTheme(); });
     gsap.ticker.add((t) => lenis.raf(t * 1000));
     gsap.ticker.lagSmoothing(0);
     lenis.stop();
@@ -114,36 +134,39 @@
     })
   );
 
-  /* ---------- Loader ---------- */
-  const counter = { v: 0 };
-  const intro = gsap.timeline({ paused: true });
-  intro
-    .to("#loader", { yPercent: -100, duration: 1.1, ease: "expo.inOut" })
-    .from(".hero-num", { scale: 1.3, opacity: 0, filter: "blur(40px)", duration: 1.8, ease: "expo.out" }, "-=0.5")
-    .from(".hero-logo", { y: 30, opacity: 0, duration: 1, ease: "expo.out" }, "-=1.5")
-    .to(".fade-in", { opacity: 1, duration: 1, stagger: 0.08 }, "-=1.2")
-    .add(() => {
-      $("#loader").remove();
-      document.body.classList.remove("is-loading");
-      lenis && lenis.start();
-      ScrollTrigger.refresh();
-    }, "-=1.4");
-
-  gsap.to(counter, {
-    v: 100,
-    duration: reduceMotion ? 0.2 : 1.8,
-    ease: "power2.inOut",
-    onUpdate: () => ($("#loaderCount").textContent = Math.round(counter.v)),
-    onComplete: () => intro.play(),
+  /* ---------- Carga ---------- */
+  // Una ventana pasa fotos de campañas; al terminar se vuelve naranja
+  // y crece hasta ocupar la pantalla, convirtiéndose en la portada.
+  const box = $("#loaderBox");
+  const frames = $$("img:not(.loader-logo)", box);
+  const finishLoading = () => {
+    $("#loader").remove();
+    document.body.classList.remove("is-loading");
+    lenis && lenis.start();
+    ScrollTrigger.refresh();
+    updateTheme();
+  };
+  const intro = gsap.timeline({ delay: 0.3 });
+  intro.from(box, { scale: 0.6, opacity: 0, duration: 0.6, ease: "expo.out" });
+  const STEP = reduceMotion ? 0.02 : 0.16;
+  frames.forEach((img, i) => {
+    intro.add(() => { frames.forEach((f) => f.classList.remove("on")); img.classList.add("on"); }, i === 0 ? ">" : `>${STEP}`);
   });
+  intro
+    .to(".loader-final", { opacity: 1, duration: 0.25 }, `>${STEP}`)
+    .to(box, { width: () => innerWidth, height: () => innerHeight, duration: 1.2, ease: "expo.inOut" }, ">0.15")
+    .add(finishLoading)
+    .from(".hero-num", { opacity: 0, scale: 1.2, filter: "blur(40px)", duration: 1.8, ease: "expo.out" }, "<")
+    .to(".fade-in", { opacity: 1, duration: 1, stagger: 0.08 }, "<0.3");
 
   /* ---------- Cursor ---------- */
   const cursor = $("#cursor");
   const cursorLabel = $("#cursorLabel");
   const hoverImg = $("#hoverImg");
   const mouse = { x: innerWidth / 2, y: innerHeight / 2 };
-  const cur = { x: mouse.x, y: mouse.y };
-  const img = { x: mouse.x, y: mouse.y };
+  const cur = { ...mouse };
+  const img = { ...mouse };
+  let cursorWhite = false;
   window.addEventListener("pointermove", (e) => { mouse.x = e.clientX; mouse.y = e.clientY; });
   gsap.ticker.add(() => {
     cur.x += (mouse.x - cur.x) * 0.25;
@@ -154,6 +177,14 @@
     hoverImg.style.left = `${img.x}px`;
     hoverImg.style.top = `${img.y}px`;
     hoverImg.style.rotate = `${gsap.utils.clamp(-8, 8, (mouse.x - img.x) * 0.05)}deg`;
+    if (finePointer) {
+      const w = isWhiteAt(mouse.x, mouse.y);
+      if (w !== cursorWhite) {
+        cursorWhite = w;
+        cursor.style.setProperty("--cursor", w ? "var(--orange)" : "var(--white)");
+        cursor.style.setProperty("--cursor-text", w ? "var(--white)" : "var(--orange)");
+      }
+    }
   });
   const bindCursor = (el, label) => {
     el.addEventListener("pointerenter", () => { cursorLabel.textContent = label; cursor.classList.add("big"); });
@@ -217,7 +248,9 @@
   /* ---------- Productos ---------- */
   gsap.fromTo(".bm-1", { xPercent: 0 }, { xPercent: -30, ease: "none", scrollTrigger: { trigger: ".big-marquee", start: "top bottom", end: "bottom top", scrub: true } });
   gsap.fromTo(".bm-2", { xPercent: -35 }, { xPercent: -5, ease: "none", scrollTrigger: { trigger: ".big-marquee", start: "top bottom", end: "bottom top", scrub: true } });
-  gsap.from(".product-list li", { opacity: 0, y: 40, duration: 1, stagger: 0.08, ease: "expo.out", scrollTrigger: { trigger: ".product-list", start: "top 80%" } });
+  $$(".product-list li").forEach((li) => {
+    gsap.from(li.querySelector("h3"), { yPercent: 60, opacity: 0, duration: 1.1, ease: "expo.out", scrollTrigger: { trigger: li, start: "top 92%" } });
+  });
 
   gsap.set(hoverImg, { scale: 0.8 });
   if (finePointer) {
@@ -234,21 +267,56 @@
     });
   }
 
-  /* ---------- Proyectos: ventana que se abre ---------- */
-  const frameImg = $("#rwFrame img");
-  const win = { t: 30, x: 12, r: 50 };
+  /* ---------- Ventana de productos: se abre y pasa fotos ---------- */
+  const SLIDE_NAMES = ["Walls", "Walls", "Pantallas gigantes", "Pantallas gigantes"];
+  const frame = $("#scFrame");
+  const slides = $$(".sc-slide");
+  const scBars = $$("#scBars i");
+  const scName = $("#scName");
+  const scIndex = $("#scIndex");
+  const win = { t: 34, x: 12, r: 50 };
   const applyWin = () => {
-    frameImg.style.setProperty("--it", `${win.t}%`);
-    frameImg.style.setProperty("--ib", `${win.t * 0.4}%`);
-    frameImg.style.setProperty("--ix", `${win.x}%`);
-    frameImg.style.setProperty("--r", `${win.r}vw`);
+    frame.style.setProperty("--it", `${win.t}%`);
+    frame.style.setProperty("--ib", `${win.t * 0.3}%`);
+    frame.style.setProperty("--ix", `${win.x}%`);
+    frame.style.setProperty("--r", `${win.r}vw`);
   };
   applyWin();
-  gsap.to(win, {
-    t: 3, x: 2.5, r: 2.5, ease: "none", onUpdate: applyWin,
-    scrollTrigger: { trigger: "#revealWindow", start: "top top", end: "bottom bottom", scrub: true },
+  let current = -1;
+  const setSlide = (i) => {
+    if (i === current) return;
+    current = i;
+    scName.textContent = SLIDE_NAMES[i];
+    scIndex.textContent = `(${String(i + 1).padStart(2, "0")}/${String(slides.length).padStart(2, "0")})`;
+    gsap.fromTo(scName, { yPercent: 60, opacity: 0 }, { yPercent: 0, opacity: 1, duration: 0.6, ease: "expo.out" });
+  };
+  setSlide(0);
+
+  const sc = gsap.timeline({
+    scrollTrigger: {
+      trigger: "#showcase",
+      start: "top top",
+      end: "bottom bottom",
+      scrub: true,
+      onUpdate: (st) => {
+        // Primer 20%: se abre la ventana. Resto: una foto por tramo.
+        const p = gsap.utils.clamp(0, 0.9999, (st.progress - 0.2) / 0.8);
+        const seg = p * slides.length;
+        const idx = Math.floor(seg);
+        scBars.forEach((b, k) => b.style.setProperty("--p", k < idx ? 1 : k === idx ? seg - idx : 0));
+        setSlide(Math.min(slides.length - 1, Math.max(0, Math.round(seg - 0.35))));
+      },
+    },
   });
-  gsap.fromTo(frameImg, { scale: 1.25 }, { scale: 1, ease: "none", scrollTrigger: { trigger: "#revealWindow", start: "top top", end: "bottom bottom", scrub: true } });
+  sc.to(win, { t: 2.5, x: 2.5, r: 2, duration: 0.2, ease: "none", onUpdate: applyWin }, 0);
+  sc.to(".sc-caption, .sc-bars", { opacity: 1, duration: 0.05, ease: "none" }, 0.15);
+  sc.fromTo($("img", slides[0]), { "--s": 1.3 }, { "--s": 1, duration: 0.2, ease: "none" }, 0);
+  slides.slice(1).forEach((s, i) => {
+    const at = 0.2 + (0.8 / slides.length) * (i + 0.6);
+    sc.fromTo(s, { clipPath: "inset(100% 0% 0% 0%)" }, { clipPath: "inset(0% 0% 0% 0%)", duration: 0.12, ease: "none" }, at);
+    sc.fromTo($("img", s), { "--s": 1.3 }, { "--s": 1, duration: 0.2, ease: "none" }, at);
+  });
+  sc.to({}, { duration: 0.001 }, 1);
 
   /* ---------- Galería horizontal ---------- */
   const track = $("#galleryTrack");
@@ -256,12 +324,12 @@
   gsap.to(track, {
     x: () => -distance(),
     ease: "none",
-    scrollTrigger: { trigger: "#gallery", start: "top top", end: () => `+=${distance()}`, pin: true, scrub: 1, invalidateOnRefresh: true },
+    scrollTrigger: { trigger: "#gallery", start: "center center", end: () => `+=${distance()}`, pin: "#proyectos", scrub: 1, invalidateOnRefresh: true },
   });
 
   /* ---------- Contacto ---------- */
   gsap.from(".contact-big span", { yPercent: 100, duration: 1.4, ease: "expo.out", scrollTrigger: { trigger: ".contact", start: "top 70%" } });
-  gsap.from(".footer-mark img", { yPercent: 40, opacity: 0, ease: "none", scrollTrigger: { trigger: ".footer-mark", start: "top bottom", end: "bottom bottom", scrub: true } });
+  gsap.from(".footer-mark", { yPercent: 30, ease: "none", scrollTrigger: { trigger: ".footer-mark", start: "top bottom", end: "bottom bottom", scrub: true } });
 
   window.addEventListener("load", () => ScrollTrigger.refresh());
 })();
