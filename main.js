@@ -41,7 +41,7 @@
     for (const el of document.elementsFromPoint(x, y)) {
       if (el.closest(".nav, .cursor")) continue;
       if (el.closest(".mk")) return true;
-      if (el.matches(".m-deps path.lit")) return false;
+      if (el.matches(".m-deps path.lit") || el.closest(".product-list li.active")) return false;
       if (el.closest(".sc-frame, .loader")) return false;
       if (el.closest(".theme-white")) return true;
       if (el.closest(".theme-orange")) return false;
@@ -113,23 +113,36 @@
   };
 
   /* ---------- Cobertura: números + mapa de soportes ---------- */
-  // Misma proyección que se usó para generar el SVG (límites de Natural Earth, dominio público).
-  const LON0 = -58.5, LAT0 = -30, COS = Math.cos((32.5 * Math.PI) / 180), K = 100;
-  const project = (lat, lng) => [(lng - LON0) * COS * K, (LAT0 - lat) * K];
-  const RATIO = 502 / 459;
+  // Límites de departamentos (geoBoundaries) y rutas: © colaboradores de OpenStreetMap (ODbL).
+  // Proyección Mercator, para que cada zona conserve su forma real. Los soportes salen de soportes.js.
+  const mapSvg = $("#mapSvg");
+  const covMap = $("#covMap");
+  const covSection = $("#cobertura");
+  const covSticky = $("#covSticky");
+  const pinsLayer = $("#covPins");
+  const PROJ = JSON.parse(mapSvg.dataset.proj);
+  const merc = (lat) => (Math.log(Math.tan(Math.PI / 4 + (lat * Math.PI) / 360)) * 180) / Math.PI;
+  const project = (lat, lng) => [(lng - PROJ.lon0) * PROJ.k + PROJ.ox, (merc(PROJ.lat0) - merc(lat)) * PROJ.k + PROJ.oy];
+  const [, , VB_W, VB_H] = mapSvg.getAttribute("viewBox").split(" ").map(Number);
+  const RATIO = VB_H / VB_W;
   const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
   const lerp01 = (p, a, b) => clamp((p - a) / (b - a), 0, 1);
   const clean = (t) => t.replace(/\s*⟲/g, "").trim();
   const fmtKm = (n) => String(n).replace(".", ",");
+  const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
+  const joinList = (arr) => (arr.length > 1 ? `${arr.slice(0, -1).join(", ")} y ${arr[arr.length - 1]}` : arr.join(""));
+
   const DATA = Object.assign({ ruteros: [], shoppings: [], pantallas: [], walls: [], duty: [] }, window.SOPORTES);
-  const TYPE_LABEL = { shopping: "Shopping", rutero: "Rutero", pantalla: "Pantalla gigante", wall: "Wall", duty: "Duty Select" };
-  const ORDER = { shopping: 0, rutero: 1, pantalla: 2, wall: 3, duty: 4 };
+  const TYPES = {
+    rutero: { one: "rutero", many: "ruteros", label: "Ruteros", tag: "Rutero" },
+    pantalla: { one: "pantalla gigante", many: "pantallas gigantes", label: "Pantallas gigantes", tag: "Pantalla gigante" },
+    wall: { one: "wall", many: "walls", label: "Walls", tag: "Wall" },
+    shopping: { one: "shopping", many: "shoppings", label: "Shoppings", tag: "Shopping" },
+    duty: { one: "aeropuerto", many: "aeropuertos", label: "Duty Select", tag: "Duty Select" },
+  };
+  const ORDER = ["rutero", "pantalla", "wall", "shopping", "duty"];
 
   const sites = [
-    ...DATA.shoppings.map(([name, n, lat, lng]) => {
-      const pde = /punta del este/i.test(name);
-      return { type: "shopping", lat, lng, n, title: clean(name).replace(/\s*Punta del Este$/i, ""), detail: `${pde ? "Punta del Este · " : ""}${n} soportes` };
-    }),
     ...DATA.ruteros.map(([name, route, km, dir, size, lat, lng]) => {
       const extra = clean(name).split(" · ")[1];
       const kmTxt = (clean(name).match(/km\s*([\d.]+)/i) || [])[1] || km;
@@ -137,94 +150,153 @@
     }),
     ...DATA.pantallas.map(([place, kind, lat, lng]) => ({ type: "pantalla", lat, lng, title: place, detail: kind })),
     ...DATA.walls.map(([place, lat, lng]) => ({ type: "wall", lat, lng, title: place, detail: "Medianera" })),
+    ...DATA.shoppings.map(([name, n, lat, lng]) => {
+      const pde = /punta del este/i.test(name);
+      return { type: "shopping", lat, lng, n, title: clean(name).replace(/\s*Punta del Este$/i, ""), detail: `${pde ? "Punta del Este · " : ""}${n} soportes` };
+    }),
     ...DATA.duty.map(([place, kind, lat, lng]) => ({ type: "duty", lat, lng, title: place, detail: kind })),
   ].map((site) => ({ ...site, xy: project(site.lat, site.lng) }));
 
-  const countOf = (t) => sites.filter((x) => x.type === t).length;
-  // Los aeropuertos tienen un circuito de pantallas: se cuentan aparte, no como un soporte.
-  const totalSoportes = sites.reduce((n, x) => n + (x.type === "shopping" ? x.n : x.type === "duty" ? 0 : 1), 0);
-  const duty = sites.filter((x) => x.type === "duty");
-  const joinList = (arr) => (arr.length > 1 ? `${arr.slice(0, -1).join(", ")} y ${arr[arr.length - 1]}` : arr.join(""));
-  const ib = sites.filter((x) => x.type === "rutero" && x.route === "Interbalnearia").sort((a, b) => a.km - b.km);
-  const mvdSites = sites.filter((x) => (x.type === "pantalla" || x.type === "wall") && x.lng < -56 && x.lng > -56.45 && x.lat > -34.95 && x.lat < -34.8);
-  const pdeSites = sites.filter((x) => x.lng > -55.02);
-  const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
-  const mvdP = mvdSites.filter((x) => x.type === "pantalla").length, mvdW = mvdSites.length - mvdP;
-  const dutyText = duty.length ? ` Y Duty Select en ${duty.length === 1 ? "el aeropuerto" : "los aeropuertos"} de ${joinList(duty.map((x) => x.title.replace(/^Aeropuerto de /, "")))}.` : "";
+  // Cada soporte se asigna al departamento donde cae (así un soporte nuevo pinta su departamento solo)
+  const depPaths = $$(".m-deps path");
+  const depOf = (xy) => {
+    try {
+      const pt = new DOMPoint(xy[0], xy[1]);
+      const hit = depPaths.find((p) => p.isPointInFill(pt));
+      if (hit) return hit.dataset.name;
+    } catch (e) { /* navegador sin isPointInFill: se usa el respaldo */ }
+    let best = null, bestD = Infinity;
+    depPaths.forEach((p) => {
+      const b = p.getBBox();
+      const d = Math.hypot(b.x + b.width / 2 - xy[0], b.y + b.height / 2 - xy[1]);
+      if (d < bestD) { bestD = d; best = p.dataset.name; }
+    });
+    return best;
+  };
+  sites.forEach((x) => (x.dep = depOf(x.xy)));
+  const byDep = {};
+  sites.forEach((x) => (byDep[x.dep] ||= []).push(x));
+  const supportDeps = depPaths.filter((p) => byDep[p.dataset.name]); // de sur a norte (orden del SVG)
+  const ofType = (t) => sites.filter((x) => x.type === t);
+  const countOf = (t) => ofType(t).length;
+  const shopSoportes = ofType("shopping").reduce((n, x) => n + x.n, 0);
+  // Los aeropuertos son circuitos de pantallas: no se suman como un soporte
+  const totalSoportes = countOf("rutero") + countOf("pantalla") + countOf("wall") + shopSoportes;
+
+  // Rutas dibujadas con la cantidad de carteles de cada una
+  const routeInfo = $$(".m-route").map((g) => {
+    const name = g.dataset.route;
+    const carteles = sites.filter((x) => x.type === "rutero" && x.route === name).sort((a, b) => a.km - b.km);
+    const tramos = [];
+    carteles.forEach((x) => { const t = tramos[tramos.length - 1]; if (t && x.km - t[t.length - 1].km <= 3) t.push(x); else tramos.push([x]); });
+    const path = $(g.querySelector("use").getAttribute("href"));
+    return { g, name, carteles, tramos, path, anchor: carteles.length ? carteles[Math.floor(carteles.length / 2)].xy : null };
+  });
+  const routesByCount = routeInfo.filter((r) => r.carteles.length).sort((a, b) => b.carteles.length - a.carteles.length);
+  // Las rutas se revelan con un círculo que crece desde Montevideo (de donde salen todas)
+  const NS = "http://www.w3.org/2000/svg";
+  const routeClip = document.createElementNS(NS, "clipPath");
+  routeClip.id = "routeClip";
+  routeClip.setAttribute("clipPathUnits", "userSpaceOnUse");
+  const clipCircle = document.createElementNS(NS, "circle");
+  const [mvdCX, mvdCY] = project(-34.9, -56.19);
+  clipCircle.setAttribute("cx", mvdCX);
+  clipCircle.setAttribute("cy", mvdCY);
+  clipCircle.setAttribute("r", 0);
+  routeClip.appendChild(clipCircle);
+  mapSvg.querySelector("defs").appendChild(routeClip);
+  $(".m-routes").setAttribute("clip-path", "url(#routeClip)");
+  const ROUTE_REACH = Math.max(VB_W, VB_H); // radio que alcanza a cubrir todas las rutas
+  const revealRoutes = (t) => clipCircle.setAttribute("r", t >= 1 ? ROUTE_REACH * 2 : ROUTE_REACH * 0.35 * t);
+  const tramoTxt = (t) => (t.length === 1 ? `km ${fmtKm(t[0].km)}` : `km ${fmtKm(t[0].km)}–${fmtKm(t[t.length - 1].km)} (${t.length})`);
+
+  // Textos
+  const nDeps = supportDeps.length;
+  const depCounts = (t) => {
+    const c = {};
+    ofType(t).forEach((x) => (c[x.dep] = (c[x.dep] || 0) + 1));
+    return Object.entries(c).sort((a, b) => b[1] - a[1]).map(([d, n]) => `${n} en ${d}`);
+  };
+  // "3 medianeras en Montevideo." o "4 pantallas gigantes: 3 en Montevideo y 1 en Maldonado."
+  const byDepText = (t, one, many) => {
+    const parts = depCounts(t);
+    const total = plural(countOf(t), one, many);
+    return parts.length === 1 ? `${total} ${parts[0].replace(/^\d+ /, "")}.` : `${total}: ${joinList(parts)}.`;
+  };
   const CAPTIONS = {
-    start: ["Uruguay", "Presencia en todo el país."],
-    light: "Presencia en los 19 departamentos.",
-    points: ["Todo el país", `${totalSoportes} soportes fijos${duty.length ? ` y pantallas en ${plural(duty.length, "aeropuerto", "aeropuertos")}` : ""}. ${finePointer ? "Pasá el mouse por un punto" : "Tocá un punto"} para ver el detalle.`],
-    mvd: ["Montevideo", `${plural(mvdP, "pantalla gigante", "pantallas gigantes")} y ${plural(mvdW, "wall", "walls")} en puntos estratégicos de la ciudad.`],
-    costa: ["Interbalnearia", ib.length ? `${ib.length} ruteros entre el km ${fmtKm(ib[0].km)} y el km ${fmtKm(ib[ib.length - 1].km)}, camino a Punta del Este.${dutyText}` : dutyText.trim()],
-    end: ["Todo el país", `${joinList([
-      ["rutero", "rutero", "ruteros"], ["shopping", "shopping", "shoppings"], ["pantalla", "pantalla gigante", "pantallas gigantes"], ["wall", "wall", "walls"], ["duty", "aeropuerto", "aeropuertos"],
-    ].filter(([t]) => countOf(t)).map(([t, one, many]) => plural(countOf(t), one, many)))}, de Salto a Punta del Este.`],
+    start: ["Uruguay", "Dónde están nuestros soportes."],
+    paint: `Soportes fijos en ${nDeps} departamentos.`,
+    routes: ["Rutas nacionales", `${plural(countOf("rutero"), "cartel", "carteles")} en ${plural(routesByCount.length, "ruta", "rutas")}.`],
+    hold: ["Todo el país", `${totalSoportes} soportes fijos en ${nDeps} departamentos. ${finePointer ? "Pasá el mouse por un departamento" : "Tocá un departamento"} para ver qué hay en cada uno.`],
+    rutero: ["Ruteros", `${plural(countOf("rutero"), "cartel", "carteles")} en ${plural(routesByCount.length, "ruta", "rutas")}: ${joinList(routesByCount.map((r) => `${r.name} (${r.carteles.length})`))}.`],
+    pantalla: ["Pantallas gigantes", byDepText("pantalla", "pantalla gigante", "pantallas gigantes")],
+    wall: ["Walls", byDepText("wall", "medianera", "medianeras")],
+    shopping: ["Shoppings", `${shopSoportes} soportes en ${plural(countOf("shopping"), "shopping", "shoppings")}: ${joinList(ofType("shopping").sort((a, b) => b.n - a.n).map((x) => `${x.title} (${x.n})`))}.`],
+    duty: ["Duty Select", `Circuito de pantallas en los free shops de ${countOf("duty") === 1 ? "el aeropuerto" : "los aeropuertos"} de ${joinList(ofType("duty").map((x) => x.title.replace(/^Aeropuerto de /, "")))}.`],
   };
 
-  // Leyenda (sin filtros: todos los soportes se ven siempre)
-  const LEGEND = [["rutero", "Ruteros"], ["shopping", "Shoppings"], ["pantalla", "Pantallas gigantes"], ["wall", "Walls"], ["duty", "Duty Select"]];
-  $("#covLegend").innerHTML = LEGEND.map(([t, name]) => `<li><i class="shape shape-${t}"></i>${name} <span data-n="${countOf(t)}">(0)</span></li>`).join("");
+  // Leyenda: el inventario completo (en el mapa filtrado se resalta el tipo activo)
+  $("#covLegend").innerHTML = ORDER.filter(countOf)
+    .map((t) => `<li data-type="${t}"><i class="shape shape-${t}"></i>${TYPES[t].label} <span data-n="${countOf(t)}">(0)</span></li>`)
+    .join("");
+  const legendItems = $$("#covLegend li");
   const legendNums = $$("#covLegend span");
 
-  // Marcadores: aparecen de oeste a este, primero los shoppings y después los ruteros
-  const covMap = $("#covMap");
-  const mapSvg = $("#mapSvg");
-  const pinsLayer = $("#covPins");
+  // Resumen simplificado de un departamento (opcionalmente, de un solo tipo)
+  const summaryHTML = (list, onlyType) =>
+    ORDER.filter((t) => !onlyType || t === onlyType)
+      .map((t) => {
+        const xs = list.filter((x) => x.type === t);
+        if (!xs.length) return "";
+        const shape = `<i class="shape shape-${t}"></i>`;
+        if (t === "rutero") return `<li>${shape}<strong>${plural(xs.length, "rutero", "ruteros")}</strong><span>${joinList([...new Set(xs.map((x) => x.route))])}</span></li>`;
+        if (t === "shopping") return `<li>${shape}<strong>${plural(xs.length, "shopping", "shoppings")}</strong><span>${joinList(xs.map((x) => x.title))} · ${xs.reduce((n, x) => n + x.n, 0)} soportes</span></li>`;
+        if (t === "duty") return xs.map((x) => `<li>${shape}<strong>Circuito de pantallas</strong><span>${x.title}</span></li>`).join("");
+        return `<li>${shape}<strong>${plural(xs.length, TYPES[t].one, TYPES[t].many)}</strong>${onlyType ? `<span>${joinList(xs.map((x) => x.title))}</span>` : ""}</li>`;
+      })
+      .join("");
+
+  // Marcadores: solo se muestran cuando el mapa se filtra desde Productos
   const markers = sites
-    .slice()
-    .sort((a, b) => ORDER[a.type] - ORDER[b.type] || a.lng - b.lng)
-    .map((site, i, arr) => {
+    .filter((x) => x.type !== "rutero")
+    .map((site, i) => {
       const el = document.createElement("div");
-      el.className = `mk mk-${site.type}${site.type === "rutero" ? "" : " ping"}`;
+      el.className = `mk mk-${site.type} ping`;
       el.innerHTML = `<i>${site.type === "shopping" ? site.n : ""}</i>`;
       el.setAttribute("role", "button");
-      el.setAttribute("tabindex", "-1");
-      el.setAttribute("aria-label", `${TYPE_LABEL[site.type]}: ${site.title}. ${site.detail}`);
-      el.style.setProperty("--d", `${(i % 6) * 0.35}s`);
+      el.tabIndex = -1;
+      el.setAttribute("aria-label", `${TYPES[site.type].tag}: ${site.title}. ${site.detail}`);
+      el.style.setProperty("--d", `${(i % 5) * 0.4}s`);
       pinsLayer.appendChild(el);
-      return { el, site, at: (i + 1) / arr.length, shown: false, sx: 0, sy: 0 };
+      return { el, site, shown: false, sx: 0, sy: 0 };
     });
 
-  // Etiquetas por zona
-  const makeLabel = (xy, text, zone) => {
+  // Etiquetas (se ubican solas donde no se pisan)
+  const makeLabel = (xy, text, kind) => {
     const el = document.createElement("div");
-    el.className = `mk-anchor l-${zone}`;
+    el.className = `mk-anchor l-${kind}`;
     el.innerHTML = `<span class="mk-label">${text}</span>`;
     pinsLayer.appendChild(el);
-    return { el, xy, text, n: 1 };
+    return { el, xy };
   };
-  const mvdLabels = [];
-  mvdSites.forEach((x) => {
-    const near = mvdLabels.find((l) => Math.hypot(l.xy[0] - x.xy[0], l.xy[1] - x.xy[1]) < 0.3);
-    if (near) { near.n += 1; near.el.firstChild.textContent = `${near.text} (${near.n})`; }
-    else mvdLabels.push(makeLabel(x.xy, x.title, "mvd"));
-  });
-  const clusters = [];
-  ib.forEach((x) => { const c = clusters[clusters.length - 1]; if (c && x.km - c[c.length - 1].km <= 3) c.push(x); else clusters.push([x]); });
-  const avgXY = (list) => [list.reduce((a, x) => a + x.xy[0], 0) / list.length, list.reduce((a, x) => a + x.xy[1], 0) / list.length];
-  const costaLabels = clusters
-    .filter((c) => c.length >= 4)
-    .map((c) => makeLabel(avgXY(c), `km ${fmtKm(c[0].km)}–${fmtKm(c[c.length - 1].km)} (${c.length})`, "costa"));
-  if (pdeSites.length) costaLabels.push(makeLabel(avgXY(pdeSites), "Punta del Este", "costa"));
-  duty.forEach((x) => costaLabels.push(makeLabel(x.xy, x.title, "costa")));
-  const allLabels = [...mvdLabels, ...costaLabels];
+  // Las etiquetas de ruta van arriba o abajo de la línea, con un punto que marca el tramo
+  const ROUTE_PREFER = ["above", "below", "above-right", "above-left", "below-right", "below-left", "right", "left"];
+  const routeLabels = routesByCount.map((r) => Object.assign(makeLabel(r.anchor, `${r.name} (${r.carteles.length})`, "route"), { prefer: ROUTE_PREFER }));
+  let filterLabels = [];
 
-  // Cámaras: todo el país → Montevideo → Interbalnearia → todo el país
-  const bbox = (list) => {
-    const xs = list.map((x) => x.xy[0]), ys = list.map((x) => x.xy[1]);
-    return { x0: Math.min(...xs), x1: Math.max(...xs), y0: Math.min(...ys), y1: Math.max(...ys) };
+  // Cámara
+  const FULL = { cx: VB_W / 2, cy: VB_H / 2, w: VB_W * 1.1 };
+  const cam = { ...FULL };
+  const fitCam = (xys, minW) => {
+    const xs = xys.map((p) => p[0]), ys = xys.map((p) => p[1]);
+    const x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys);
+    return { cx: (x0 + x1) / 2, cy: (y0 + y1) / 2, w: Math.min(FULL.w, Math.max((x1 - x0) * 1.4, ((y1 - y0) * 1.4) / RATIO, minW)) };
   };
-  const mvdBox = mvdSites.length ? bbox(mvdSites) : { x0: 195, x1: 200, y0: 488, y1: 491 };
-  const costaSites = [...ib, ...pdeSites, ...duty];
-  const costaBox = bbox(costaSites.length ? costaSites : sites);
-  const CAMS = {
-    full: () => ({ cx: 229.5, cy: 251, w: 459 * 1.14 }), // margen para que la costa no caiga en el borde difuminado
-    mvd: () => ({ cx: (mvdBox.x0 + mvdBox.x1) / 2, cy: (mvdBox.y0 + mvdBox.y1) / 2, w: Math.max((mvdBox.x1 - mvdBox.x0) * 1.7, covMap.clientWidth / 60) }),
-    costa: () => ({ cx: (costaBox.x0 + costaBox.x1) / 2, cy: (costaBox.y0 + costaBox.y1) / 2 - 4, w: Math.max(90, (costaBox.x1 - costaBox.x0) * 1.3) }),
+  const camFor = (f) => {
+    if (!f) return { ...FULL };
+    if (f === "rutero") return fitCam(ofType("rutero").map((x) => x.xy), 60);
+    return fitCam(ofType(f).map((x) => x.xy), Math.max(covMap.clientWidth / 55, 9));
   };
-  const cam = CAMS.full();
-
   const placeAll = () => {
     const ctm = mapSvg.getScreenCTM();
     if (!ctm) return;
@@ -238,22 +310,26 @@
       if (store) { store.sx = x; store.sy = y; }
     };
     markers.forEach((m) => put(m.el, m.site.xy, m));
-    allLabels.forEach((l) => put(l.el, l.xy));
+    [...routeLabels, ...filterLabels].forEach((l) => put(l.el, l.xy));
   };
   const applyCam = () => {
     const h = cam.w * RATIO;
     mapSvg.setAttribute("viewBox", `${cam.cx - cam.w / 2} ${cam.cy - h / 2} ${cam.w} ${h}`);
     placeAll();
   };
+  let camTween = null;
+  const moveCam = (target, animate) => {
+    if (camTween) camTween.kill();
+    if (animate && hasGsap && !reduceMotion) camTween = gsap.to(cam, { ...target, duration: 1.3, ease: "power3.inOut", onUpdate: applyCam });
+    else { Object.assign(cam, target); applyCam(); }
+  };
 
-  // Ubica cada etiqueta (derecha, izquierda, arriba o abajo) donde no pise a otra,
-  // calculado para la vista final de su zona. Si no entra, no se muestra.
-  const placeLabels = (labels, target) => {
+  const placeLabels = (labels, target, avoid = []) => {
     const bw = covMap.clientWidth, bh = covMap.clientHeight;
     const scale = bw / target.w;
     const vbx = target.cx - target.w / 2, vby = target.cy - (target.w * RATIO) / 2;
     const toScreen = (xy) => [(xy[0] - vbx) * scale, (xy[1] - vby) * scale];
-    const dots = markers.map((m) => { const [x, y] = toScreen(m.site.xy); return [x - 7, y - 7, x + 7, y + 7]; });
+    const dots = avoid.map((xy) => { const [x, y] = toScreen(xy); return [x - 8, y - 8, x + 8, y + 8]; });
     const taken = [];
     const overlaps = (r, list, pad) => list.some((t) => r[0] < t[2] + pad && r[2] + pad > t[0] && r[1] < t[3] + pad && r[3] + pad > t[1]);
     labels.forEach((l) => {
@@ -265,10 +341,10 @@
         right: [x + G, y - h / 2], left: [x - G - w, y - h / 2], above: [x - w / 2, y - G - h], below: [x - w / 2, y + G],
         "above-right": [x + D, y - G - h], "below-right": [x + D, y + G], "above-left": [x - D - w, y - G - h], "below-left": [x - D - w, y + G],
       };
+      const order = (l.prefer || Object.keys(opts)).map((k) => [k, opts[k]]);
       l.el.dataset.pos = "none";
-      // Primero busca un lugar que no tape etiquetas ni puntos; si no hay, alcanza con no tapar etiquetas.
       for (const avoidDots of [true, false]) {
-        const found = Object.entries(opts).find(([, [lx, ly]]) => {
+        const found = order.find(([, [lx, ly]]) => {
           const r = [lx, ly, lx + w, ly + h];
           const inside = lx > 6 && ly > 6 && r[2] < bw - 6 && r[3] < bh - 6;
           return inside && !overlaps(r, taken, 5) && !(avoidDots && overlaps(r, dots, 1));
@@ -277,61 +353,74 @@
       }
     });
   };
+  // Etiquetas del filtro: los puntos muy juntos se agrupan ("Montevideo (3)")
+  const buildFilterLabels = (f, target) => {
+    filterLabels.forEach((l) => l.el.remove());
+    filterLabels = [];
+    if (!f || f === "rutero") return;
+    const scale = covMap.clientWidth / target.w;
+    const groups = [];
+    ofType(f).forEach((x) => {
+      const g = groups.find((gr) => Math.hypot((gr[0].xy[0] - x.xy[0]) * scale, (gr[0].xy[1] - x.xy[1]) * scale) < 26);
+      if (g) g.push(x); else groups.push([x]);
+    });
+    filterLabels = groups.map((g) => makeLabel(g.length === 1 ? g[0].xy : [g.reduce((a, x) => a + x.xy[0], 0) / g.length, g.reduce((a, x) => a + x.xy[1], 0) / g.length], g.length === 1 ? g[0].title : `${g[0].dep} (${g.length})`, "filter"));
+    placeLabels(filterLabels, target, ofType(f).map((x) => x.xy));
+    placeAll();
+  };
 
-  // Tarjeta de detalle: si hay varios soportes juntos, los lista a todos
+  // Tarjeta de detalle
   const covCard = $("#covCard");
-  const covSticky = $("#covSticky");
   let cardFor = null, hideTimer;
-  const showCard = (m) => {
+  const showCardAt = (html, x, y, key) => {
     clearTimeout(hideTimer);
-    markers.forEach((o) => o.el.classList.toggle("active", o === m));
-    const near = markers
-      .filter((o) => o.shown && Math.hypot(o.sx - m.sx, o.sy - m.sy) < 16)
-      .sort((a, b) => ORDER[a.site.type] - ORDER[b.site.type] || (a.site.km || 0) - (b.site.km || 0));
-    const list = near.length ? near : [m];
-    if (list.length === 1) {
-      const x = list[0].site;
-      covCard.innerHTML = `<p class="cc-tag">(${TYPE_LABEL[x.type]})</p><p class="cc-title">${x.title}</p><p class="cc-detail">${x.detail}</p>`;
-    } else {
-      const MAX = 6;
-      const items = list.slice(0, MAX).map(({ site: x }) => `<li><strong>${x.title}</strong><span>${TYPE_LABEL[x.type]} · ${x.detail}</span></li>`).join("");
-      covCard.innerHTML = `<p class="cc-tag">(${list.length} soportes en esta zona)</p><ul class="cc-list">${items}</ul>${list.length > MAX ? `<p class="cc-more">y ${list.length - MAX} más</p>` : ""}`;
-    }
-    const sb = covSticky.getBoundingClientRect(), mb = covMap.getBoundingClientRect();
-    const x = mb.left - sb.left + m.sx, y = mb.top - sb.top + m.sy;
+    if (cardFor !== key) covCard.innerHTML = html;
+    const sb = covSticky.getBoundingClientRect();
     const w = covCard.offsetWidth, h = covCard.offsetHeight;
     covCard.classList.toggle("below", y - h - 24 < 64);
     covCard.style.left = `${clamp(x, w / 2 + 12, sb.width - w / 2 - 12)}px`;
     covCard.style.top = `${y}px`;
     covCard.classList.add("show");
-    cardFor = m;
+    cardFor = key;
   };
   const hideCard = () => {
     covCard.classList.remove("show");
     markers.forEach((o) => o.el.classList.remove("active"));
+    routeInfo.forEach((r) => r.g.classList.remove("hover"));
     cardFor = null;
   };
-  markers.forEach((m) => {
-    if (finePointer) {
-      m.el.addEventListener("pointerenter", () => showCard(m));
-      m.el.addEventListener("pointerleave", () => { hideTimer = setTimeout(hideCard, 150); });
-    }
-    m.el.addEventListener("click", (e) => { e.stopPropagation(); cardFor === m ? hideCard() : showCard(m); });
-    m.el.addEventListener("focus", () => showCard(m));
-    m.el.addEventListener("blur", () => { hideTimer = setTimeout(hideCard, 150); });
-  });
-  document.addEventListener("click", (e) => { if (cardFor && !e.target.closest(".mk")) hideCard(); });
+  const relToSticky = (cx, cy) => { const sb = covSticky.getBoundingClientRect(); return [cx - sb.left, cy - sb.top]; };
 
-  // Estado del mapa según el avance del scroll (0 → 1)
-  const depPaths = $$(".m-deps path");
-  const roadsLayer = $(".m-roads");
-  const covSection = $("#cobertura");
-  const covCount = $("#covCount"), covZone = $("#covZone"), covText = $("#covText");
-  const measureDraw = () => {
-    const scale = covMap.clientWidth / CAMS.full().w; // px por unidad con el país entero a la vista
-    depPaths.forEach((path) => (path.dataset.len = path.getTotalLength() * scale));
+  const showMarkerCard = (m) => {
+    markers.forEach((o) => o.el.classList.toggle("active", o === m));
+    const near = markers.filter((o) => o.shown && Math.hypot(o.sx - m.sx, o.sy - m.sy) < 16);
+    const list = near.length ? near : [m];
+    const html = list.length === 1
+      ? `<p class="cc-tag">(${TYPES[m.site.type].tag})</p><p class="cc-title">${m.site.title}</p><p class="cc-detail">${m.site.detail}</p>`
+      : `<p class="cc-tag">(${list.length} soportes en esta zona)</p><ul class="cc-list">${list.map(({ site: x }) => `<li><strong>${x.title}</strong><span>${TYPES[x.type].tag} · ${x.detail}</span></li>`).join("")}</ul>`;
+    const mb = covMap.getBoundingClientRect();
+    const [x, y] = relToSticky(mb.left + m.sx, mb.top + m.sy);
+    showCardAt(html, x, y, m);
   };
-  let lastLit = -1, lastCaption = "", lastPoints = -1;
+  const showDepCard = (path, cx, cy) => {
+    const list = byDep[path.dataset.name] || [];
+    const html = `<p class="cc-title">${path.dataset.name}</p><ul class="cc-sum">${summaryHTML(list, filter)}</ul>`;
+    const [x, y] = relToSticky(cx, cy);
+    showCardAt(html, x, y, `dep:${path.dataset.name}:${filter}`);
+  };
+  const showRouteCard = (r, cx, cy) => {
+    routeInfo.forEach((o) => o.g.classList.toggle("hover", o === r));
+    const html = `<p class="cc-tag">(Ruta)</p><p class="cc-title">${r.name}</p><p class="cc-detail">${plural(r.carteles.length, "cartel", "carteles")}</p><p class="cc-tramos">${r.tramos.map(tramoTxt).join(" · ")}</p>`;
+    const [x, y] = relToSticky(cx, cy);
+    showCardAt(html, x, y, r);
+  };
+
+  // Estado del mapa
+  let filter = null;   // tipo elegido desde Productos
+  let holding = false; // terminó el recorrido de entrada: el mapa es interactivo
+  const covCount = $("#covCount"), covZone = $("#covZone"), covText = $("#covText"), covReset = $("#covReset");
+  const routesLayer = $(".m-routes");
+  let lastCaption = "";
   const setCaption = (zone, text, animate = true) => {
     if (zone + text === lastCaption) return;
     lastCaption = zone + text;
@@ -339,46 +428,122 @@
     covText.textContent = text;
     if (animate && hasGsap) gsap.fromTo([covZone, covText], { y: 10, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5, stagger: 0.05, ease: "expo.out", overwrite: true });
   };
-  const updateCoverage = (p) => {
-    // 1) se dibujan los departamentos
-    const draw = lerp01(p, 0, 0.12);
-    depPaths.forEach((path, i) => {
-      const len = +path.dataset.len;
-      if (!len) return;
-      const local = clamp(draw * 1.6 - (i / depPaths.length) * 0.6, 0, 1);
-      path.style.strokeDasharray = local >= 1 ? "none" : `${len} ${len}`;
-      path.style.strokeDashoffset = local >= 1 ? 0 : len * (1 - local);
-    });
-    // 2) se pintan de naranja, de Montevideo al norte, y el contador llega a 19
-    const lit = Math.round(lerp01(p, 0.1, 0.3) * depPaths.length);
-    if (lit !== lastLit) {
-      lastLit = lit;
-      depPaths.forEach((path, i) => path.classList.toggle("lit", i < lit));
-      covCount.textContent = lit;
-    }
-    // 3) rutas
-    roadsLayer.style.opacity = lerp01(p, 0.3, 0.36);
-    // 4) aparecen los soportes y la leyenda cuenta
-    const pts = lerp01(p, 0.34, 0.46);
+  const setLit = (fn) => depPaths.forEach((p) => p.classList.toggle("lit", !!fn(p)));
+  const setDash = (el, len, t) => {
+    el.style.strokeDasharray = t >= 1 ? "none" : `${len} ${len}`;
+    el.style.strokeDashoffset = t >= 1 ? 0 : len * (1 - t);
+  };
+
+  const renderHold = () => {
+    covSection.classList.toggle("is-filtered", !!filter);
+    covSection.dataset.filter = filter || "";
+    covCount.textContent = nDeps;
+    setLit((p) => (byDep[p.dataset.name] || []).some((x) => !filter || x.type === filter));
+    depPaths.forEach((p) => setDash(p, 0, 1));
+    revealRoutes(1);
+    routesLayer.classList.toggle("hide", !!filter && filter !== "rutero");
     markers.forEach((m) => {
-      const on = pts >= m.at;
+      const on = !!filter && m.site.type === filter;
       if (on !== m.shown) { m.shown = on; m.el.classList.toggle("show", on); m.el.tabIndex = on ? 0 : -1; }
     });
-    const ptsKey = Math.round(pts * 100);
-    if (ptsKey !== lastPoints) {
-      lastPoints = ptsKey;
-      legendNums.forEach((el) => (el.textContent = `(${Math.round(+el.dataset.n * pts)})`));
-    }
-    // 5) etiquetas de cada zona
-    covSection.classList.toggle("z-mvd", p > 0.58 && p < 0.67);
-    covSection.classList.toggle("z-costa", p > 0.74 && p < 0.85);
-    if (p < 0.1) setCaption(...CAPTIONS.start);
-    else if (p < 0.3) setCaption(depPaths[Math.max(0, lit - 1)].dataset.name, CAPTIONS.light, false);
-    else if (p < 0.5) setCaption(...CAPTIONS.points);
-    else if (p < 0.66) setCaption(...CAPTIONS.mvd);
-    else if (p < 0.84) setCaption(...CAPTIONS.costa);
-    else setCaption(...CAPTIONS.end);
+    legendNums.forEach((el) => (el.textContent = `(${el.dataset.n})`));
+    legendItems.forEach((li) => li.classList.toggle("on", !filter || li.dataset.type === filter));
+    covReset.hidden = !filter;
+    setCaption(...(filter ? CAPTIONS[filter] : CAPTIONS.hold));
   };
+
+  const setFilter = (f, animate = true) => {
+    filter = f || null;
+    hideCard();
+    const target = camFor(filter);
+    buildFilterLabels(filter, target);
+    placeLabels(routeLabels, target);
+    if (holding) renderHold();
+    moveCam(target, animate);
+  };
+  covReset.addEventListener("click", () => setFilter(null));
+
+  // Recorrido de entrada según el avance del scroll (0 → 1)
+  const HOLD = 0.6;
+  const measureDraw = () => {
+    const scale = covMap.clientWidth / FULL.w; // px por unidad con el país entero a la vista
+    depPaths.forEach((p) => (p.dataset.len = p.getTotalLength() * scale));
+  };
+  const updateCoverage = (p) => {
+    if (p >= HOLD) {
+      if (!holding) { holding = true; covSection.classList.add("is-holding"); renderHold(); }
+      return;
+    }
+    if (holding) {
+      holding = false;
+      covSection.classList.remove("is-holding");
+      hideCard();
+      if (filter) setFilter(null);
+      markers.forEach((m) => { m.shown = false; m.el.classList.remove("show"); m.el.tabIndex = -1; });
+      covReset.hidden = true;
+    }
+    // 1) se dibujan todos los departamentos
+    const draw = lerp01(p, 0, 0.2);
+    depPaths.forEach((path, i) => setDash(path, +path.dataset.len || 0, clamp(draw * 1.6 - (i / depPaths.length) * 0.6, 0, 1)));
+    // 2) se pintan de naranja los que tienen soportes, de sur a norte
+    const lit = Math.round(lerp01(p, 0.18, 0.4) * supportDeps.length);
+    supportDeps.forEach((path, i) => path.classList.toggle("lit", i < lit));
+    covCount.textContent = lit;
+    // 3) se dibujan las rutas con sus carteles
+    const rt = lerp01(p, 0.42, 0.56);
+    revealRoutes(rt);
+    covSection.classList.toggle("show-routes", p > 0.52);
+    routesLayer.classList.remove("hide");
+    const cnt = lerp01(p, 0.4, 0.56);
+    legendNums.forEach((el) => (el.textContent = `(${Math.round(+el.dataset.n * cnt)})`));
+    legendItems.forEach((li) => li.classList.add("on"));
+    if (p < 0.18) setCaption(...CAPTIONS.start);
+    else if (p < 0.42) setCaption(supportDeps.length ? supportDeps[Math.max(0, lit - 1)].dataset.name : "Uruguay", CAPTIONS.paint, false);
+    else setCaption(...CAPTIONS.routes);
+  };
+
+  // Interacción: departamentos, rutas y marcadores
+  depPaths.forEach((path) => {
+    const on = () => holding && path.classList.contains("lit");
+    path.addEventListener("pointermove", (e) => { if (on() && e.pointerType === "mouse") showDepCard(path, e.clientX, e.clientY); });
+    path.addEventListener("pointerleave", () => { if (typeof cardFor === "string" && cardFor.startsWith("dep:")) hideTimer = setTimeout(hideCard, 80); });
+    path.addEventListener("click", (e) => { if (!on()) return; e.stopPropagation(); showDepCard(path, e.clientX, e.clientY); });
+  });
+  routeInfo.forEach((r) => {
+    const hit = r.g.querySelector(".r-hit");
+    hit.addEventListener("pointermove", (e) => { if (holding && e.pointerType === "mouse") showRouteCard(r, e.clientX, e.clientY); });
+    hit.addEventListener("pointerleave", () => { if (cardFor === r) hideTimer = setTimeout(hideCard, 80); });
+    hit.addEventListener("click", (e) => { if (!holding) return; e.stopPropagation(); showRouteCard(r, e.clientX, e.clientY); });
+  });
+  markers.forEach((m) => {
+    if (finePointer) {
+      m.el.addEventListener("pointerenter", () => showMarkerCard(m));
+      m.el.addEventListener("pointerleave", () => { hideTimer = setTimeout(hideCard, 150); });
+    }
+    m.el.addEventListener("click", (e) => { e.stopPropagation(); showMarkerCard(m); });
+    m.el.addEventListener("focus", () => showMarkerCard(m));
+    m.el.addEventListener("blur", () => { hideTimer = setTimeout(hideCard, 150); });
+  });
+  document.addEventListener("click", (e) => { if (cardFor && !e.target.closest(".mk, .m-deps, .m-routes")) hideCard(); });
+
+  // Desde Productos: volver al mapa filtrado por ese tipo de soporte
+  let lenis; // se inicializa más abajo si hay scroll suave
+  const goToMap = (f) => {
+    const top = covSection.getBoundingClientRect().top + window.scrollY;
+    const y = top + (covSection.offsetHeight - innerHeight) * 0.8;
+    setFilter(f, holding);
+    if (lenis) lenis.scrollTo(y, { duration: 1.6 });
+    else window.scrollTo({ top: y, behavior: reduceMotion ? "auto" : "smooth" });
+  };
+  $$("#productList li[data-filter]").forEach((li) => {
+    const name = li.querySelector("h3").textContent;
+    li.classList.add("has-map");
+    li.setAttribute("role", "link");
+    li.tabIndex = 0;
+    li.setAttribute("aria-label", `${name}: ver en el mapa de cobertura`);
+    li.addEventListener("click", () => goToMap(li.dataset.filter));
+    li.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); goToMap(li.dataset.filter); } });
+  });
 
   /* ---------- Sin GSAP (CDN caído): mostrar todo estático ---------- */
   if (!hasGsap) {
@@ -389,6 +554,7 @@
     $$("[data-count]").forEach(countUp);
     $$(".sc-slide").forEach((s) => (s.style.clipPath = "none"));
     covSection.style.height = "auto";
+    placeLabels(routeLabels, FULL);
     applyCam();
     updateCoverage(1);
     window.addEventListener("resize", applyCam);
@@ -399,7 +565,6 @@
   gsap.registerPlugin(ScrollTrigger);
 
   /* ---------- Scroll suave ---------- */
-  let lenis;
   if (!reduceMotion && typeof window.Lenis !== "undefined") {
     lenis = new Lenis({ lerp: 0.09 });
     lenis.on("scroll", () => { ScrollTrigger.update(); queueTheme(); });
@@ -467,6 +632,7 @@
   };
   $$("[data-cursor]").forEach((el) => bindCursor(el, el.dataset.cursor));
   $$(".g-item").forEach((el) => bindCursor(el, "Ver"));
+  $$("#productList li[data-filter]").forEach((el) => bindCursor(el, "Ver en mapa"));
 
   /* ---------- Hero: luz que sigue al mouse ---------- */
   const heroNum = $(".hero-num");
@@ -635,25 +801,32 @@
   sc.to({}, { duration: 0.001 }, 1);
 
   /* ---------- Cobertura: animación con el scroll ---------- */
-  const covTl = gsap.timeline({
-    scrollTrigger: {
-      trigger: "#cobertura", start: "top top", end: "bottom bottom", scrub: 0.5, invalidateOnRefresh: true,
-      onRefresh: () => {
-        measureDraw();
-        placeLabels(mvdLabels, CAMS.mvd());
-        placeLabels(costaLabels, CAMS.costa());
-        applyCam();
+  gsap
+    .timeline({
+      scrollTrigger: {
+        trigger: "#cobertura", start: "top top", end: "bottom bottom", scrub: 0.5, invalidateOnRefresh: true,
+        onRefresh: () => {
+          measureDraw();
+          const target = camFor(filter);
+          placeLabels(routeLabels, target);
+          if (filter) buildFilterLabels(filter, target);
+          if (!camTween || !camTween.isActive()) Object.assign(cam, target);
+          applyCam();
+        },
+        onUpdate: () => { if (cardFor) hideCard(); },
       },
-      onUpdate: () => { if (cardFor) hideCard(); },
-    },
-    onUpdate() { updateCoverage(this.progress()); },
+      onUpdate() { updateCoverage(this.progress()); },
+    })
+    .to({}, { duration: 1 });
+  // Al salir de la sección, el mapa vuelve a mostrar todos los soportes
+  ScrollTrigger.create({
+    trigger: "#cobertura", start: "top bottom", end: "bottom top",
+    onLeave: () => filter && setFilter(null, false),
+    onLeaveBack: () => filter && setFilter(null, false),
   });
-  const camTo = (name, at) => covTl.to(cam, { cx: () => CAMS[name]().cx, cy: () => CAMS[name]().cy, w: () => CAMS[name]().w, duration: 0.1, ease: "power2.inOut", onUpdate: applyCam }, at);
-  camTo("mvd", 0.5);
-  camTo("costa", 0.66);
-  camTo("full", 0.84);
-  covTl.to({}, { duration: 0.06 }, 0.94);
   measureDraw();
+  placeLabels(routeLabels, FULL);
+  applyCam();
   updateCoverage(0);
   window.addEventListener("resize", () => requestAnimationFrame(applyCam));
 

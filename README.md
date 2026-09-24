@@ -16,8 +16,8 @@ Inspirada en ghuynguyen.vercel.app, con el contenido de la web actual de Movimag
 2. Portada: "30" con luz que sigue al mouse
 3. Sobre nosotros: texto que se ilumina palabra por palabra al hacer scroll
 4. Valores: confianza, flexibilidad y cercanía, con fotos que salen desde el centro
-5. Cobertura: los números (30 años, 50+ soportes, 19 departamentos, 5 terminales) junto al mapa de Uruguay. El mapa se dibuja, se pinta de naranja, muestra todos los soportes y recorre Montevideo y la Interbalnearia. Al pasar por un punto se ve el detalle
-6. Productos: filas con cinta animada al pasar el mouse y ventana que pasa fotos
+5. Cobertura: los números (30 años, 50+ soportes, departamentos con soportes, 5 terminales) junto al mapa. Se pintan de naranja solo los departamentos con soportes y se dibujan las rutas con su cantidad de carteles. Al pasar por un departamento se ve un resumen de lo que hay; al pasar por una ruta, sus carteles por tramo
+6. Productos: filas con cinta animada al pasar el mouse. Al hacer clic en un producto (menos Buses) se vuelve al mapa mostrando solo las ubicaciones de ese tipo; el botón "Ver todos los soportes" quita el filtro
 7. Proyectos: galería horizontal
 8. Testimonios en carrusel
 9. Clientes: logos en movimiento
@@ -25,10 +25,13 @@ Inspirada en ghuynguyen.vercel.app, con el contenido de la web actual de Movimag
 
 Librerías por CDN: GSAP + ScrollTrigger y Lenis. Si no cargan, la página se muestra estática.
 
-Las imágenes en `assets/` vienen de movimagen.com.uy. Límites de departamentos y rutas: Natural Earth (dominio público).
+Las imágenes en `assets/` vienen de movimagen.com.uy.
 
 ## Soportes del mapa
-Están en `soportes.js` (ruteros, shoppings, pantallas, walls y aeropuertos de Duty Select con sus coordenadas). Para sumar uno, agregá una línea en la lista que corresponda; el mapa, la leyenda y los textos se actualizan solos.
+Están en `soportes.js` (ruteros, shoppings, pantallas, walls y aeropuertos de Duty Select con sus coordenadas). Para sumar uno, agregá una línea en la lista que corresponda: su departamento se detecta solo y el mapa, la leyenda y los textos se actualizan.
+
+## Mapa
+Límites de departamentos de geoBoundaries y trazado de rutas de OpenStreetMap (© colaboradores de OpenStreetMap, licencia ODbL: el crédito tiene que quedar visible en el mapa). Proyección Mercator, con más detalle en Montevideo y la costa. Para regenerarlo (por ejemplo, si se suma una ruta nueva), ver `tools/generar-mapa.mjs`.
 
 ## Pendiente
 - Conectar el formulario a un backend (hoy arma un mail a info@movimagen.com)
