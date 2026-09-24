@@ -10,18 +10,22 @@ python3 -m http.server 8000
 ```
 
 ## Secciones
-1. Hero: ciudad nocturna animada en canvas con pantallas LED
-2. Marquee de formatos
-3. Servicios: tarjetas con inclinación 3D
-4. Números con contador animado
-5. "Mirá tu marca en la calle": simulador de cartel interactivo
-6. Cobertura: mapa con zonas
-7. Casos
-8. Proceso
-9. Contacto: formulario que abre el correo
+Inspirada en ghuynguyen.vercel.app, con el contenido de la web actual de Movimagen:
 
-## Pendiente (marcado con TODO en el código)
-- Cifras reales en la sección de números
-- Campañas reales con fotos o videos en la sección de casos
-- Ubicaciones reales de los soportes en el mapa
-- Confirmar el email de contacto y conectar el formulario a un backend
+1. Portada: "30" con luz que sigue al mouse, precargador con contador
+2. Sobre nosotros: texto que se ilumina palabra por palabra al hacer scroll
+3. Valores: confianza, flexibilidad y cercanía, con fotos de campañas flotando
+4. Números: 30 años, 50+ soportes, 19 departamentos, 5 terminales
+5. Productos: Buses, Shoppings, Pantallas gigantes, Walls, Duty Select y Ruteros, con foto al pasar el mouse
+6. Proyectos: foto que se abre al hacer scroll y galería horizontal
+7. Testimonios en carrusel
+8. Clientes: logos en movimiento
+9. Contacto: formulario de cotización (abre el correo) y datos de la empresa
+
+Librerías por CDN: GSAP + ScrollTrigger y Lenis. Si no cargan, la página se muestra estática.
+
+Las imágenes en `assets/` vienen de movimagen.com.uy.
+
+## Pendiente
+- Conectar el formulario a un backend (hoy arma un mail a info@movimagen.com)
+- Fotos de mayor resolución para los proyectos (las actuales son de 400 px)
