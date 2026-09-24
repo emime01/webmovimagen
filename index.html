@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Movimagen | Publicidad exterior en Uruguay</title>
+  <meta name="description" content="Movimagen: pantallas LED, carteleras y mobiliario urbano. Llevamos tu marca a la calle en todo Uruguay." />
+  <meta name="theme-color" content="#07070c" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="cursor-glow" aria-hidden="true"></div>
+
+  <!-- NAV -->
+  <header class="nav" id="nav">
+    <a href="#inicio" class="logo">MOVI<span>MAGEN</span></a>
+    <nav class="nav-links" id="navLinks">
+      <a href="#servicios">Servicios</a>
+      <a href="#tu-marca">Tu marca</a>
+      <a href="#cobertura">Cobertura</a>
+      <a href="#casos">Casos</a>
+      <a href="#proceso">Proceso</a>
+    </nav>
+    <a href="#contacto" class="btn btn-small">Cotizar</a>
+    <button class="menu-toggle" id="menuToggle" aria-label="Abrir menú"><span></span><span></span></button>
+  </header>
+
+  <main>
+    <!-- 1. HERO -->
+    <section class="hero" id="inicio">
+      <canvas id="city" aria-hidden="true"></canvas>
+      <div class="hero-content">
+        <p class="eyebrow reveal">Publicidad exterior · Uruguay</p>
+        <h1 class="hero-title">
+          <span class="line"><span>Tu marca,</span></span>
+          <span class="line"><span>en la <em class="glow-text">calle.</em></span></span>
+        </h1>
+        <p class="hero-sub reveal">Pantallas LED, carteleras y mobiliario urbano en los puntos donde la ciudad mira.</p>
+        <div class="hero-cta reveal">
+          <a href="#contacto" class="btn">Planificar campaña</a>
+          <a href="#tu-marca" class="btn btn-ghost">Ver tu marca en un cartel →</a>
+        </div>
+      </div>
+      <div class="scroll-hint" aria-hidden="true"><span></span></div>
+    </section>
+
+    <!-- 2. MARQUEE -->
+    <div class="marquee" aria-hidden="true">
+      <div class="marquee-track">
+        <span>Pantallas LED</span><i>✦</i><span>DOOH</span><i>✦</i><span>Carteleras</span><i>✦</i><span>Mobiliario urbano</span><i>✦</i><span>Transporte</span><i>✦</i><span>Activaciones</span><i>✦</i>
+        <span>Pantallas LED</span><i>✦</i><span>DOOH</span><i>✦</i><span>Carteleras</span><i>✦</i><span>Mobiliario urbano</span><i>✦</i><span>Transporte</span><i>✦</i><span>Activaciones</span><i>✦</i>
+      </div>
+    </div>
+
+    <!-- 3. SERVICIOS -->
+    <section class="section" id="servicios">
+      <div class="section-head reveal">
+        <p class="eyebrow">01 — Servicios</p>
+        <h2>Formatos que <em>no se pueden ignorar.</em></h2>
+      </div>
+      <div class="cards">
+        <article class="card reveal" data-tilt>
+          <div class="card-icon">▦</div>
+          <h3>Pantallas LED</h3>
+          <p>Circuitos digitales en avenidas de alto tránsito. Contenido dinámico, programación por franja horaria.</p>
+          <span class="card-tag">DOOH</span>
+        </article>
+        <article class="card reveal" data-tilt>
+          <div class="card-icon">▭</div>
+          <h3>Carteleras</h3>
+          <p>Gran formato en rutas y accesos. Presencia permanente, visibilidad de día y de noche.</p>
+          <span class="card-tag">Gran formato</span>
+        </article>
+        <article class="card reveal" data-tilt>
+          <div class="card-icon">◫</div>
+          <h3>Mobiliario urbano</h3>
+          <p>Paradas, columnas y chupetes a la altura de los ojos del peatón. Frecuencia y cercanía.</p>
+          <span class="card-tag">Peatonal</span>
+        </article>
+        <article class="card reveal" data-tilt>
+          <div class="card-icon">◎</div>
+          <h3>Activaciones</h3>
+          <p>Campañas especiales, intervenciones y experiencias que convierten la calle en noticia.</p>
+          <span class="card-tag">Especiales</span>
+        </article>
+      </div>
+    </section>
+
+    <!-- 4. NÚMEROS -->
+    <!-- TODO: reemplazar con cifras reales de Movimagen -->
+    <section class="stats">
+      <div class="stat reveal"><strong data-count="120">0</strong><span>+ soportes</span></div>
+      <div class="stat reveal"><strong data-count="19">0</strong><span>departamentos</span></div>
+      <div class="stat reveal"><strong data-count="2">0</strong><span>M impactos diarios</span></div>
+      <div class="stat reveal"><strong data-count="24">0</strong><span>/7 encendidos</span></div>
+    </section>
+
+    <!-- 5. TU MARCA EN LA CALLE -->
+    <section class="section brand-lab" id="tu-marca">
+      <div class="section-head reveal">
+        <p class="eyebrow">02 — Probalo</p>
+        <h2>Mirá tu marca <em>en la calle.</em></h2>
+        <p class="lead">Escribí tu mensaje, elegí un color y miralo en una pantalla de avenida.</p>
+      </div>
+      <div class="lab">
+        <div class="lab-controls reveal">
+          <label>Tu marca o mensaje
+            <input type="text" id="brandInput" maxlength="28" value="Tu marca acá" />
+          </label>
+          <label>Color
+            <div class="swatches" id="swatches">
+              <button class="swatch active" style="--c:#ff2e63" data-c="#ff2e63" aria-label="Rosa"></button>
+              <button class="swatch" style="--c:#08d9d6" data-c="#08d9d6" aria-label="Turquesa"></button>
+              <button class="swatch" style="--c:#ffd23f" data-c="#ffd23f" aria-label="Amarillo"></button>
+              <button class="swatch" style="--c:#7b61ff" data-c="#7b61ff" aria-label="Violeta"></button>
+              <button class="swatch" style="--c:#ffffff" data-c="#ffffff" aria-label="Blanco"></button>
+            </div>
+          </label>
+          <label>Momento del día
+            <div class="toggle" id="timeToggle">
+              <button class="active" data-t="night">Noche</button>
+              <button data-t="day">Día</button>
+            </div>
+          </label>
+          <a href="#contacto" class="btn">Quiero esto →</a>
+        </div>
+        <div class="lab-scene reveal night" id="scene">
+          <div class="scene-sky"></div>
+          <div class="scene-buildings"></div>
+          <div class="billboard" id="billboard">
+            <div class="billboard-screen" id="billboardScreen">
+              <span id="billboardText">Tu marca acá</span>
+            </div>
+            <div class="billboard-pole"></div>
+          </div>
+          <div class="scene-street"><div class="car"></div><div class="car car-2"></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. COBERTURA -->
+    <section class="section" id="cobertura">
+      <div class="coverage">
+        <div class="section-head reveal">
+          <p class="eyebrow">03 — Cobertura</p>
+          <h2>Donde está <em>tu público.</em></h2>
+          <p class="lead">Montevideo, Punta del Este y las principales rutas del país. Tocá una zona para verla.</p>
+          <ul class="zones" id="zones">
+            <li class="active" data-zone="mvd"><strong>Montevideo</strong><span>Avenidas, rambla y centros comerciales</span></li>
+            <li data-zone="pde"><strong>Punta del Este</strong><span>Temporada alta, público premium</span></li>
+            <li data-zone="rutas"><strong>Rutas nacionales</strong><span>Accesos y corredores de tránsito</span></li>
+          </ul>
+        </div>
+        <div class="map reveal" id="map">
+          <!-- Silueta estilizada de Uruguay -->
+          <svg viewBox="0 0 400 420" class="map-svg">
+            <path class="uy" d="M92 40 L150 22 L205 30 L262 58 L318 92 L352 150 L372 214 L368 262 L338 300 L300 334 L250 362 L196 376 L150 372 L112 352 L84 318 L64 270 L52 214 L50 160 L62 100 Z"/>
+            <path class="route" d="M150 370 C170 300 200 240 250 180 S330 110 318 92"/>
+            <path class="route" d="M150 370 C130 300 110 220 92 40"/>
+            <path class="route" d="M150 370 C220 360 280 350 330 305"/>
+          </svg>
+          <div class="pins" id="pins"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7. CASOS -->
+    <!-- TODO: reemplazar con campañas reales (fotos/video en assets/) -->
+    <section class="section" id="casos">
+      <div class="section-head reveal">
+        <p class="eyebrow">04 — Casos</p>
+        <h2>Campañas que <em>se vieron.</em></h2>
+      </div>
+      <div class="cases">
+        <article class="case reveal" style="--g1:#ff2e63;--g2:#7b61ff">
+          <div class="case-media"><span>Lanzamiento</span></div>
+          <div class="case-info"><h3>Lanzamiento de producto</h3><p>Circuito LED en 12 puntos de Montevideo durante 30 días.</p><em>+38% recordación</em></div>
+        </article>
+        <article class="case reveal" style="--g1:#08d9d6;--g2:#1f4bff">
+          <div class="case-media"><span>Temporada</span></div>
+          <div class="case-info"><h3>Temporada Punta del Este</h3><p>Carteleras en ruta Interbalnearia y pantallas en península.</p><em>1.2M impactos</em></div>
+        </article>
+        <article class="case reveal" style="--g1:#ffd23f;--g2:#ff6b35">
+          <div class="case-media"><span>Retail</span></div>
+          <div class="case-info"><h3>Campaña retail</h3><p>Mobiliario urbano cerca de cada sucursal, contenido por barrio.</p><em>+22% tráfico en tienda</em></div>
+        </article>
+      </div>
+    </section>
+
+    <!-- 8. PROCESO -->
+    <section class="section" id="proceso">
+      <div class="section-head reveal">
+        <p class="eyebrow">05 — Proceso</p>
+        <h2>De la idea <em>a la calle.</em></h2>
+      </div>
+      <ol class="steps">
+        <li class="step reveal"><span>01</span><h3>Brief</h3><p>Entendemos tu objetivo, tu público y tu presupuesto.</p></li>
+        <li class="step reveal"><span>02</span><h3>Plan</h3><p>Elegimos soportes, zonas y fechas para máximo alcance.</p></li>
+        <li class="step reveal"><span>03</span><h3>Producción</h3><p>Adaptamos las piezas a cada formato y las instalamos.</p></li>
+        <li class="step reveal"><span>04</span><h3>Reporte</h3><p>Te mostramos fotos de la campaña y resultados.</p></li>
+      </ol>
+    </section>
+
+    <!-- 9. CONTACTO -->
+    <section class="section contact" id="contacto">
+      <div class="contact-inner reveal">
+        <p class="eyebrow">06 — Contacto</p>
+        <h2>¿Salimos <em class="glow-text">a la calle?</em></h2>
+        <p class="lead">Contanos de tu campaña y te armamos una propuesta en 24 horas.</p>
+        <form class="form" id="contactForm">
+          <input name="nombre" placeholder="Nombre" required />
+          <input name="empresa" placeholder="Empresa" />
+          <input name="email" type="email" placeholder="Email" required />
+          <select name="formato">
+            <option value="">Formato de interés</option>
+            <option>Pantallas LED</option>
+            <option>Carteleras</option>
+            <option>Mobiliario urbano</option>
+            <option>Activaciones</option>
+            <option>No sé, asesórenme</option>
+          </select>
+          <textarea name="mensaje" rows="4" placeholder="Contanos de tu campaña"></textarea>
+          <button type="submit" class="btn">Enviar consulta</button>
+          <p class="form-note" id="formNote"></p>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <a href="#inicio" class="logo">MOVI<span>MAGEN</span></a>
+    <p>Publicidad exterior · Montevideo, Uruguay</p>
+    <p><a href="mailto:info@movimagen.com.uy">info@movimagen.com.uy</a></p>
+    <p class="copy">© <span id="year"></span> Movimagen</p>
+  </footer>
+
+  <script src="main.js"></script>
+</body>
+</html>
