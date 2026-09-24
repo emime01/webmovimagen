@@ -33,12 +33,15 @@
   <div class="cursor" id="cursor" aria-hidden="true"><span id="cursorLabel"></span></div>
 
   <header class="nav" id="nav">
-    <a href="#somos">(Somos)</a>
-    <a href="#cobertura">(Cobertura)</a>
-    <a href="#productos">(Productos)</a>
-    <a href="#proyectos">(Proyectos)</a>
-    <a href="#clientes">(Clientes)</a>
-    <a href="#contacto">(Contacto)</a>
+    <a href="#somos" data-i18n="nav.somos">Somos</a>
+    <a href="#cobertura" data-i18n="nav.cobertura">Cobertura</a>
+    <a href="#productos" data-i18n="nav.productos">Productos</a>
+    <a href="#proyectos" data-i18n="nav.proyectos">Proyectos</a>
+    <a href="#clientes" data-i18n="nav.clientes">Clientes</a>
+    <a href="#contacto" data-i18n="nav.contacto">Contacto</a>
+    <div class="lang" role="group" aria-label="Idioma" data-i18n-attr="aria-label:lang.label">
+      <button type="button" data-lang="es" aria-pressed="true">ES</button><span aria-hidden="true">/</span><button type="button" data-lang="en" aria-pressed="false">EN</button>
+    </div>
   </header>
 
   <main>
@@ -46,8 +49,8 @@
     <section class="hero theme-orange" id="inicio">
       <div class="hero-glow" aria-hidden="true"><span class="hero-num">30</span></div>
       <h1 class="hero-logo"><img src="assets/logo-blanco.png" alt="Movimagen" /></h1>
-      <p class="hero-side hero-left fade-in">Publicidad exterior<br />en todo Uruguay.</p>
-      <p class="hero-side hero-right fade-in">Más de 30 años conectando<br />marcas con personas.</p>
+      <p class="hero-side hero-left fade-in" data-i18n="hero.left">Publicidad exterior<br />en todo Uruguay.</p>
+      <p class="hero-side hero-right fade-in" data-i18n="hero.right">Más de 30 años conectando<br />marcas con personas.</p>
       <div class="hero-foot fade-in">
         <span>34°52'49" S</span>
         <span>Montevideo, Uruguay</span>
@@ -57,11 +60,11 @@
 
     <!-- SOMOS -->
     <section class="about theme-white" id="somos">
-      <p class="label">(Sobre nosotros)</p>
-      <p class="about-text" data-words>
+      <p class="label" data-i18n="about.label">Sobre nosotros</p>
+      <p class="about-text" data-words data-i18n="about.text">
         En Movimagen llevamos más de 30 años acompañando a las marcas a conectar con las personas, a través de un portafolio con más de 50 tipos de soportes y presencia en todo el país.
       </p>
-      <p class="about-sub" data-words>
+      <p class="about-sub" data-words data-i18n="about.sub">
         Nuestro propósito es construir un entorno donde cada colaborador quiera estar, donde los clientes nos elijan por nuestra calidad de servicio, los proveedores nos vean como socios y todos, juntos, agreguemos valor a la sociedad.
       </p>
     </section>
@@ -77,10 +80,10 @@
           <circle class="dot" r="4"><animateMotion dur="18s" repeatCount="indefinite" path="M0,455 a225,225 0 1,0 450,0 a225,225 0 1,0 -450,0" /></circle>
           <circle class="dot" r="4"><animateMotion dur="16s" repeatCount="indefinite" path="M700,455 a225,225 0 1,1 -450,0 a225,225 0 1,1 450,0" /></circle>
         </svg>
-        <span class="circle-label cl-1">Confianza</span>
-        <span class="circle-label cl-2">Flexibilidad</span>
-        <span class="circle-label cl-3">Cercanía</span>
-        <h2 class="values-title">Confianza, flexibilidad, cercanía:<br />lo que nos define.</h2>
+        <span class="circle-label cl-1" data-i18n="values.trust">Confianza</span>
+        <span class="circle-label cl-2" data-i18n="values.flex">Flexibilidad</span>
+        <span class="circle-label cl-3" data-i18n="values.close">Cercanía</span>
+        <h2 class="values-title" data-i18n="values.title">Confianza, flexibilidad, cercanía:<br />lo que nos define.</h2>
         <div class="floats" aria-hidden="true">
           <img src="assets/proyectos/polar.png" class="float" alt="" />
           <img src="assets/hero/9692.jpg" class="float" alt="" />
@@ -102,17 +105,17 @@
     <section class="coverage theme-white" id="cobertura">
       <div class="cov-sticky" id="covSticky">
         <div class="cov-info">
-          <p class="label">(Cobertura)</p>
+          <p class="label" data-i18n="cov.label">Cobertura</p>
           <div class="cov-stats">
-            <div class="cov-stat"><strong data-count="30">0</strong><span>(Años de experiencia)</span></div>
-            <div class="cov-stat"><strong data-count="50" data-suffix="+">0</strong><span>(Tipos de soportes)</span></div>
-            <div class="cov-stat"><strong id="covCount">0</strong><span>(Departamentos)</span></div>
-            <div class="cov-stat"><strong data-count="5">0</strong><span>(Terminales de buses)</span></div>
+            <div class="cov-stat"><strong data-count="30">0</strong><span data-i18n="cov.years">Años de experiencia</span></div>
+            <div class="cov-stat"><strong data-count="50" data-suffix="+">0</strong><span data-i18n="cov.types">Tipos de soportes</span></div>
+            <div class="cov-stat"><strong id="covCount">0</strong><span data-i18n="cov.deps">Departamentos</span></div>
+            <div class="cov-stat"><strong data-count="5">0</strong><span data-i18n="cov.terminals">Terminales de buses</span></div>
           </div>
           <div class="cov-caption">
             <p class="cov-zone" id="covZone">Uruguay</p>
             <p class="cov-text" id="covText">Dónde están nuestros soportes.</p>
-            <button type="button" class="cov-reset" id="covReset" hidden>Ver todos los soportes</button>
+            <button type="button" class="cov-reset" id="covReset" hidden data-i18n="cov.reset">Ver todos los soportes</button>
           </div>
           <ul class="cov-legend" id="covLegend"></ul>
         </div>
@@ -123,7 +126,7 @@
             <g class="m-routes"><g class="m-route" data-route="Ruta 1"><use href="#rt-1" class="r-casing"/><use href="#rt-1" class="r-line"/><use href="#rt-1" class="r-hit"/></g><g class="m-route" data-route="Ruta 5"><use href="#rt-5" class="r-casing"/><use href="#rt-5" class="r-line"/><use href="#rt-5" class="r-hit"/></g><g class="m-route" data-route="Interbalnearia"><use href="#rt-IB" class="r-casing"/><use href="#rt-IB" class="r-line"/><use href="#rt-IB" class="r-hit"/></g><g class="m-route" data-route="Ruta 101"><use href="#rt-101" class="r-casing"/><use href="#rt-101" class="r-line"/><use href="#rt-101" class="r-hit"/></g><g class="m-route" data-route="Ruta 102"><use href="#rt-102" class="r-casing"/><use href="#rt-102" class="r-line"/><use href="#rt-102" class="r-hit"/></g></g>
           </svg>
           <div class="cov-pins" id="covPins"></div>
-          <p class="cov-credit">Mapa: © colaboradores de OpenStreetMap</p>
+          <p class="cov-credit" data-i18n="cov.credit">Mapa: © colaboradores de OpenStreetMap</p>
         </div>
         <div class="cov-card" id="covCard" aria-live="polite"></div>
       </div>
@@ -132,42 +135,42 @@
     <!-- PRODUCTOS -->
     <section class="products theme-white" id="productos">
       <div class="big-marquee" aria-hidden="true">
-        <div class="bm-row bm-1"><span>Productos</span><i></i><span>Productos</span><i></i><span>Productos</span><i></i><span>Productos</span><i></i></div>
-        <div class="bm-row bm-2"><span>Soportes</span><i></i><span>Soportes</span><i></i><span>Soportes</span><i></i><span>Soportes</span><i></i></div>
+        <div class="bm-row bm-1"><span data-i18n="products.word">Productos</span><i></i><span data-i18n="products.word">Productos</span><i></i><span data-i18n="products.word">Productos</span><i></i><span data-i18n="products.word">Productos</span><i></i></div>
+        <div class="bm-row bm-2"><span data-i18n="products.word2">Soportes</span><i></i><span data-i18n="products.word2">Soportes</span><i></i><span data-i18n="products.word2">Soportes</span><i></i><span data-i18n="products.word2">Soportes</span><i></i></div>
       </div>
 
       <div class="products-intro">
-        <span>(Formato)</span>
-        <p>Cada soporte es una palanca: juntos hacen que tu marca llegue a todo el país. Elegí uno para verlo en el mapa.</p>
-        <span>(Alcance)</span>
+        <span data-i18n="products.format">Formato</span>
+        <p data-i18n="products.intro">Cada soporte es una palanca: juntos hacen que tu marca llegue a todo el país. Elegí uno para verlo en el mapa.</p>
+        <span data-i18n="products.reach">Alcance</span>
       </div>
 
       <ul class="product-list" id="productList">
-        <li data-imgs="assets/proyectos/bauducco.png,assets/proyectos/polar.png,assets/proyectos/gatorade.png"><span class="p-cat">Movilidad</span><h3>Buses</h3><span class="p-meta">(Urbanos)-(Interdepartamentales)</span></li>
-        <li data-filter="shopping" data-imgs="assets/proyectos/proyecto.png,assets/proyectos/ucu.png"><span class="p-cat">Retail</span><h3>Shoppings</h3><span class="p-meta">(Estático)-(Pantallas)</span></li>
-        <li data-filter="pantalla" data-imgs="assets/hero/9692.jpg,assets/hero/9693.jpg"><span class="p-cat">Vía pública</span><h3>Pantallas gigantes</h3><span class="p-meta">(LED)</span></li>
-        <li data-filter="wall" data-imgs="assets/hero/9691.jpg,assets/hero/home.jpg,assets/proyectos/schneck.png"><span class="p-cat">Gran formato</span><h3>Walls</h3><span class="p-meta">(Av. Italia)-(Rivera)-(18 de Julio)</span></li>
-        <li data-filter="duty" data-imgs="assets/video.jpg"><span class="p-cat">Aeropuertos</span><h3>Duty Select</h3><span class="p-meta">(Carrasco)-(Punta del Este)</span></li>
-        <li data-filter="rutero" data-imgs="assets/hero/home.jpg,assets/hero/9691.jpg"><span class="p-cat">Rutas</span><h3>Ruteros</h3><span class="p-meta">(Accesos estratégicos)</span></li>
+        <li data-imgs="assets/proyectos/bauducco.png,assets/proyectos/polar.png,assets/proyectos/gatorade.png"><span class="p-cat" data-i18n="p.buses.cat">Movilidad</span><h3 data-i18n="p.buses.name">Buses</h3><span class="p-meta" data-i18n="p.buses.meta">Urbanos e interdepartamentales</span></li>
+        <li data-filter="shopping" data-imgs="assets/proyectos/proyecto.png,assets/proyectos/ucu.png"><span class="p-cat" data-i18n="p.shop.cat">Retail</span><h3 data-i18n="p.shop.name">Shoppings</h3><span class="p-meta" data-i18n="p.shop.meta">Estático y pantallas</span></li>
+        <li data-filter="pantalla" data-imgs="assets/hero/9692.jpg,assets/hero/9693.jpg"><span class="p-cat" data-i18n="p.pant.cat">Vía pública</span><h3 data-i18n="p.pant.name">Pantallas gigantes</h3><span class="p-meta" data-i18n="p.pant.meta">LED</span></li>
+        <li data-filter="wall" data-imgs="assets/hero/9691.jpg,assets/hero/home.jpg,assets/proyectos/schneck.png"><span class="p-cat" data-i18n="p.walls.cat">Gran formato</span><h3 data-i18n="p.walls.name">Walls</h3><span class="p-meta" data-i18n="p.walls.meta">Av. Italia, Rivera y 18 de Julio</span></li>
+        <li data-filter="duty" data-imgs="assets/video.jpg"><span class="p-cat" data-i18n="p.duty.cat">Aeropuertos</span><h3 data-i18n="p.duty.name">Duty Select</h3><span class="p-meta" data-i18n="p.duty.meta">Carrasco y Punta del Este</span></li>
+        <li data-filter="rutero" data-imgs="assets/hero/home.jpg,assets/hero/9691.jpg"><span class="p-cat" data-i18n="p.rut.cat">Rutas</span><h3 data-i18n="p.rut.name">Ruteros</h3><span class="p-meta" data-i18n="p.rut.meta">Accesos estratégicos</span></li>
       </ul>
 
       <div class="products-head">
-        <span>(En la calle)</span>
-        <p>Soportes que la ciudad<br />mira todos los días</p>
-        <span>(Uruguay)</span>
+        <span data-i18n="products.street">En la calle</span>
+        <p data-i18n="products.head">Soportes que la ciudad<br />mira todos los días</p>
+        <span data-i18n="products.country">Uruguay</span>
       </div>
 
       <!-- Ventana que se abre y pasa fotos -->
       <div class="showcase" id="showcase">
         <div class="sc-sticky">
           <div class="sc-frame" id="scFrame">
-            <figure class="sc-slide"><img src="assets/hero/home.jpg" alt="Wall de Jetmar sobre una avenida de Montevideo" /></figure>
-            <figure class="sc-slide"><img src="assets/hero/9691.jpg" alt="Wall publicitario en la esquina de un edificio de ladrillo" /></figure>
-            <figure class="sc-slide"><img src="assets/hero/9692.jpg" alt="Pantalla gigante de Conaprole sobre una avenida con tránsito" /></figure>
-            <figure class="sc-slide"><img src="assets/hero/9693.jpg" alt="Pantalla gigante sobre un local de comida en una esquina" /></figure>
+            <figure class="sc-slide"><img src="assets/hero/home.jpg" alt="Wall de Jetmar sobre una avenida de Montevideo" data-i18n-attr="alt:sc.alt1" /></figure>
+            <figure class="sc-slide"><img src="assets/hero/9691.jpg" alt="Wall publicitario en la esquina de un edificio de ladrillo" data-i18n-attr="alt:sc.alt2" /></figure>
+            <figure class="sc-slide"><img src="assets/hero/9692.jpg" alt="Pantalla gigante de Conaprole sobre una avenida con tránsito" data-i18n-attr="alt:sc.alt3" /></figure>
+            <figure class="sc-slide"><img src="assets/hero/9693.jpg" alt="Pantalla gigante sobre un local de comida en una esquina" data-i18n-attr="alt:sc.alt4" /></figure>
             <div class="sc-caption">
               <span id="scName">Walls</span>
-              <span id="scIndex">(01/04)</span>
+              <span id="scIndex">01/04</span>
             </div>
             <div class="sc-bars" id="scBars"><i></i><i></i><i></i><i></i></div>
           </div>
@@ -178,9 +181,9 @@
     <!-- PROYECTOS -->
     <section class="projects theme-orange" id="proyectos">
       <div class="projects-head">
-        <span>(Últimos)</span>
-        <h2>Campañas que hicieron<br />mirar a la ciudad</h2>
-        <span>(Proyectos)</span>
+        <span data-i18n="projects.latest">Últimos</span>
+        <h2 data-i18n="projects.title">Campañas que hicieron<br />mirar a la ciudad</h2>
+        <span data-i18n="projects.label">Proyectos</span>
       </div>
       <div class="gallery" id="gallery">
         <div class="gallery-track" id="galleryTrack">
@@ -197,30 +200,30 @@
 
     <!-- TESTIMONIOS -->
     <section class="testimonials theme-white" id="testimonios">
-      <p class="label">(¿Qué dicen nuestros clientes?)</p>
+      <p class="label" data-i18n="testimonials.label">¿Qué dicen nuestros clientes?</p>
       <div class="t-stage">
         <figure class="t-item active">
-          <blockquote>“Desde Canarias elegimos Movimagen por dos razones: el entendimiento real de las necesidades del cliente y la flexibilidad en las propuestas.”</blockquote>
+          <blockquote data-i18n="t.1">“Desde Canarias elegimos Movimagen por dos razones: el entendimiento real de las necesidades del cliente y la flexibilidad en las propuestas.”</blockquote>
           <figcaption>Nelson Loira <span>— Canarias S.A.</span></figcaption>
         </figure>
         <figure class="t-item">
-          <blockquote>“Se nota el profesionalismo, calidad y rapidez de ejecución de todas las áreas involucradas durante el proceso.”</blockquote>
+          <blockquote data-i18n="t.2">“Se nota el profesionalismo, calidad y rapidez de ejecución de todas las áreas involucradas durante el proceso.”</blockquote>
           <figcaption>Leonardo Icardo <span>— Juan Construye</span></figcaption>
         </figure>
         <figure class="t-item">
-          <blockquote>“Con Movimagen lo encontramos y desde el primer día nos dieron la tranquilidad de que estábamos en buenas manos.”</blockquote>
+          <blockquote data-i18n="t.3">“Con Movimagen lo encontramos y desde el primer día nos dieron la tranquilidad de que estábamos en buenas manos.”</blockquote>
           <figcaption>Mathias Galindez <span>— Paigo (Credisol)</span></figcaption>
         </figure>
         <figure class="t-item">
-          <blockquote>“Más que un proveedor, es un socio estratégico que entiende nuestras necesidades y nos acompaña en campañas de alto impacto.”</blockquote>
+          <blockquote data-i18n="t.4">“Más que un proveedor, es un socio estratégico que entiende nuestras necesidades y nos acompaña en campañas de alto impacto.”</blockquote>
           <figcaption>Alfredo Scarlatto <span>— La Especialista</span></figcaption>
         </figure>
         <figure class="t-item">
-          <blockquote>“Su cultura del ‘SÍ’ nos exige ser mejores clientes.”</blockquote>
+          <blockquote data-i18n="t.5">“Su cultura del ‘SÍ’ nos exige ser mejores clientes.”</blockquote>
           <figcaption>Gabriel González <span>— Grupo Mainau</span></figcaption>
         </figure>
         <figure class="t-item">
-          <blockquote>“Movimagen es una empresa confiable y flexible que se adapta a las necesidades de su cliente.”</blockquote>
+          <blockquote data-i18n="t.6">“Movimagen es una empresa confiable y flexible que se adapta a las necesidades de su cliente.”</blockquote>
           <figcaption>Leonardo Appoloni <span>— Diageo</span></figcaption>
         </figure>
       </div>
@@ -230,32 +233,32 @@
     <!-- CLIENTES -->
     <section class="clients theme-orange" id="clientes">
       <div class="clients-head">
-        <span>(Clientes)</span>
-        <h2>Marcas que confían<br />en la calle</h2>
-        <span>(+30)</span>
+        <span data-i18n="clients.label">Clientes</span>
+        <h2 data-i18n="clients.title">Marcas que confían<br />en la calle</h2>
+        <span>+30</span>
       </div>
       <div class="logo-marquee" id="logoRows"></div>
     </section>
 
     <!-- CONTACTO -->
     <section class="contact theme-white" id="contacto">
-      <p class="label">(Solicitá tu cotización)</p>
-      <a class="contact-big" href="mailto:info@movimagen.com" data-cursor="Escribinos"><span>Hablemos</span></a>
+      <p class="label" data-i18n="contact.label">Solicitá tu cotización</p>
+      <a class="contact-big" href="mailto:info@movimagen.com" data-cursor="write"><span data-i18n="contact.big">Hablemos</span></a>
       <form class="form" id="quoteForm">
-        <div class="field"><label for="f-nombre">Nombre *</label><input id="f-nombre" name="nombre" required /></div>
-        <div class="field"><label for="f-email">E-mail *</label><input id="f-email" name="email" type="email" required /></div>
-        <div class="field"><label for="f-tel">Teléfono</label><input id="f-tel" name="telefono" type="tel" /></div>
-        <div class="field"><label for="f-plazo">Plazo de la campaña *</label>
+        <div class="field"><label for="f-nombre" data-i18n="form.name">Nombre *</label><input id="f-nombre" name="nombre" required /></div>
+        <div class="field"><label for="f-email" data-i18n="form.email">E-mail *</label><input id="f-email" name="email" type="email" required /></div>
+        <div class="field"><label for="f-tel" data-i18n="form.phone">Teléfono</label><input id="f-tel" name="telefono" type="tel" /></div>
+        <div class="field"><label for="f-plazo" data-i18n="form.term">Plazo de la campaña *</label>
           <div class="inline">
             <input id="f-plazo" name="plazo" type="number" min="1" required />
-            <select name="unidad" aria-label="Unidad del plazo"><option>Meses</option><option>Semanas</option><option>Días</option></select>
+            <select name="unidad" aria-label="Unidad del plazo" data-i18n-attr="aria-label:form.unit"><option value="Meses" data-i18n="form.months">Meses</option><option value="Semanas" data-i18n="form.weeks">Semanas</option><option value="Días" data-i18n="form.days">Días</option></select>
           </div>
         </div>
-        <div class="field"><label for="f-inicio">Fecha de inicio *</label><input id="f-inicio" name="inicio" type="date" required /></div>
-        <div class="field"><label for="f-fin">Fecha de finalización *</label><input id="f-fin" name="fin" type="date" required /></div>
-        <div class="field full"><label for="f-inv">Inversión mensual estimada (en pesos) *</label><input id="f-inv" name="inversion" inputmode="numeric" placeholder="$" required /></div>
-        <div class="field full"><label for="f-msg">Mensaje / producto a publicitar *</label><textarea id="f-msg" name="mensaje" rows="3" required></textarea></div>
-        <button type="submit" class="submit" data-cursor="Enviar"><span>Enviar y solicitar propuesta</span><span>→</span></button>
+        <div class="field"><label for="f-inicio" data-i18n="form.start">Fecha de inicio *</label><input id="f-inicio" name="inicio" type="date" required /></div>
+        <div class="field"><label for="f-fin" data-i18n="form.end">Fecha de finalización *</label><input id="f-fin" name="fin" type="date" required /></div>
+        <div class="field full"><label for="f-inv" data-i18n="form.budget">Inversión mensual estimada en pesos *</label><input id="f-inv" name="inversion" inputmode="numeric" placeholder="$" required /></div>
+        <div class="field full"><label for="f-msg" data-i18n="form.msg">Mensaje / producto a publicitar *</label><textarea id="f-msg" name="mensaje" rows="3" required></textarea></div>
+        <button type="submit" class="submit" data-cursor="send"><span data-i18n="form.submit">Enviar y solicitar propuesta</span><span>→</span></button>
         <p class="form-note" id="formNote"></p>
       </form>
     </section>
@@ -263,18 +266,18 @@
     <footer class="footer theme-orange">
       <div class="footer-grid">
         <div>
-          <p class="f-label">(Dirección)</p>
+          <p class="f-label" data-i18n="footer.address">Dirección</p>
           <p>Avenida Almirante Harwood 6411<br />Montevideo, Uruguay</p>
         </div>
         <div>
-          <p class="f-label">(Contacto)</p>
-          <p><a href="tel:+59826001881">(+598) 2600 18 81</a><br /><a href="mailto:info@movimagen.com">info@movimagen.com</a></p>
+          <p class="f-label" data-i18n="footer.contact">Contacto</p>
+          <p><a href="tel:+59826001881">+598 2600 18 81</a><br /><a href="mailto:info@movimagen.com">info@movimagen.com</a></p>
         </div>
         <div class="socials">
-          <a href="https://www.instagram.com/movimagenok" target="_blank" rel="noopener">(Instagram)</a>
-          <a href="https://www.facebook.com/movimagen" target="_blank" rel="noopener">(Facebook)</a>
-          <a href="https://www.youtube.com/channel/UCs9RMr6_M5p-O6HGRHlL0Zw" target="_blank" rel="noopener">(YouTube)</a>
-          <a href="https://twitter.com/Movimagen" target="_blank" rel="noopener">(Twitter)</a>
+          <a href="https://www.instagram.com/movimagenok" target="_blank" rel="noopener">Instagram</a>
+          <a href="https://www.facebook.com/movimagen" target="_blank" rel="noopener">Facebook</a>
+          <a href="https://www.youtube.com/channel/UCs9RMr6_M5p-O6HGRHlL0Zw" target="_blank" rel="noopener">YouTube</a>
+          <a href="https://twitter.com/Movimagen" target="_blank" rel="noopener">Twitter</a>
         </div>
         <p class="copy">© <span id="year"></span> Girarlor S.A.</p>
       </div>
@@ -286,6 +289,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
   <script src="soportes.js"></script>
+  <script src="i18n.js"></script>
   <script src="main.js"></script>
 </body>
 </html>
