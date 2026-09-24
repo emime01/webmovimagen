@@ -27,11 +27,19 @@
     })
     .join("");
 
+  /* ---------- Cintas de productos ---------- */
+  $$("#productList li").forEach((li) => {
+    const name = li.querySelector("h3").textContent;
+    const imgs = li.dataset.imgs.split(",");
+    const unit = [0, 1, 2, 3].map((i) => `<span>${name}</span><img src="${imgs[i % imgs.length]}" alt="" loading="lazy" />`).join("");
+    li.insertAdjacentHTML("beforeend", `<div class="p-mq" aria-hidden="true"><div class="p-mq-inner"><div class="p-mq-track">${unit}${unit}</div></div></div>`);
+  });
+
   /* ---------- Menú y cursor según el fondo ---------- */
   // Sobre fondo blanco se ven naranjas; sobre naranja o fotos, blancos.
   const isWhiteAt = (x, y) => {
     for (const el of document.elementsFromPoint(x, y)) {
-      if (el.closest(".nav, .cursor, .hover-img")) continue;
+      if (el.closest(".nav, .cursor")) continue;
       if (el.closest(".sc-frame, .loader")) return false;
       if (el.closest(".theme-white")) return true;
       if (el.closest(".theme-orange")) return false;
@@ -162,21 +170,14 @@
   /* ---------- Cursor ---------- */
   const cursor = $("#cursor");
   const cursorLabel = $("#cursorLabel");
-  const hoverImg = $("#hoverImg");
   const mouse = { x: innerWidth / 2, y: innerHeight / 2 };
   const cur = { ...mouse };
-  const img = { ...mouse };
   let cursorWhite = false;
   window.addEventListener("pointermove", (e) => { mouse.x = e.clientX; mouse.y = e.clientY; });
   gsap.ticker.add(() => {
     cur.x += (mouse.x - cur.x) * 0.25;
     cur.y += (mouse.y - cur.y) * 0.25;
-    img.x += (mouse.x - img.x) * 0.1;
-    img.y += (mouse.y - img.y) * 0.1;
     cursor.style.transform = `translate(${cur.x}px, ${cur.y}px)`;
-    hoverImg.style.left = `${img.x}px`;
-    hoverImg.style.top = `${img.y}px`;
-    hoverImg.style.rotate = `${gsap.utils.clamp(-8, 8, (mouse.x - img.x) * 0.05)}deg`;
     if (finePointer) {
       const w = isWhiteAt(mouse.x, mouse.y);
       if (w !== cursorWhite) {
@@ -252,18 +253,47 @@
     gsap.from(li.querySelector("h3"), { yPercent: 60, opacity: 0, duration: 1.1, ease: "expo.out", scrollTrigger: { trigger: li, start: "top 92%" } });
   });
 
-  gsap.set(hoverImg, { scale: 0.8 });
-  if (finePointer) {
-    $$("#productList li").forEach((li) => {
-      li.addEventListener("pointerenter", () => {
-        hoverImg.src = li.dataset.img;
-        hoverImg.classList.add("show");
-        gsap.to(hoverImg, { scale: 1, duration: 0.5, ease: "expo.out" });
-      });
-      li.addEventListener("pointerleave", () => {
-        hoverImg.classList.remove("show");
-        gsap.to(hoverImg, { scale: 0.8, duration: 0.4 });
-      });
+  // Al pasar por una fila entra una cinta desde el lado por donde llega el mouse
+  // (arriba o abajo) y sale por donde se va. En pantallas táctiles se activa
+  // la fila que cruza el centro de la pantalla.
+  const rowTween = (li, show, fromTop) => {
+    const mq = li.querySelector(".p-mq");
+    const inner = li.querySelector(".p-mq-inner");
+    const edge = fromTop ? -101 : 101;
+    gsap.killTweensOf([mq, inner]);
+    if (show) {
+      li.classList.add("active");
+      gsap.fromTo(mq, { yPercent: edge }, { yPercent: 0, duration: 0.6, ease: "expo.out" });
+      gsap.fromTo(inner, { yPercent: -edge }, { yPercent: 0, duration: 0.6, ease: "expo.out" });
+    } else {
+      gsap.to(mq, { yPercent: edge, duration: 0.6, ease: "expo.out" });
+      gsap.to(inner, { yPercent: -edge, duration: 0.6, ease: "expo.out", onComplete: () => li.classList.remove("active") });
+    }
+  };
+  const rows = $$("#productList li");
+  rows.forEach((li) => {
+    gsap.set(li.querySelector(".p-mq"), { yPercent: 101 });
+    gsap.set(li.querySelector(".p-mq-inner"), { yPercent: -101 });
+    if (!finePointer) return;
+    const fromTop = (e) => { const r = li.getBoundingClientRect(); return e.clientY < r.top + r.height / 2; };
+    li.addEventListener("pointerenter", (e) => rowTween(li, true, fromTop(e)));
+    li.addEventListener("pointerleave", (e) => rowTween(li, false, fromTop(e)));
+  });
+  if (!finePointer) {
+    let activeRow = null, lastY = scrollY;
+    ScrollTrigger.create({
+      trigger: "#productList", start: "top 60%", end: "bottom 40%",
+      onUpdate: (st) => {
+        const mid = innerHeight / 2;
+        const next = st.isActive ? rows.find((li) => { const r = li.getBoundingClientRect(); return r.top <= mid && r.bottom > mid; }) || null : null;
+        const down = scrollY >= lastY;
+        lastY = scrollY;
+        if (next === activeRow) return;
+        if (activeRow) rowTween(activeRow, false, down);
+        if (next) rowTween(next, true, !down);
+        activeRow = next;
+      },
+      onToggle: (st) => { if (!st.isActive && activeRow) { rowTween(activeRow, false, st.direction > 0); activeRow = null; } },
     });
   }
 
