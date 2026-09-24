@@ -410,7 +410,7 @@
   let camTween = null;
   const moveCam = (target, animate) => {
     if (camTween) camTween.kill();
-    if (animate && hasGsap && !reduceMotion) camTween = gsap.to(cam, { ...target, duration: 1.3, ease: "power3.inOut", onUpdate: applyCam });
+    if (animate && hasGsap && !reduceMotion) camTween = gsap.to(cam, { ...target, duration: 1.05, ease: "power3.inOut", onUpdate: applyCam });
     else { Object.assign(cam, target); applyCam(); }
   };
 
@@ -537,7 +537,7 @@
     if (!on) { routeReveal.t = 0; revealRoutes(0); return; }
     if (hasGsap && !reduceMotion) {
       revealTween = gsap.fromTo(routeReveal, { t: 0 }, {
-        t: 1, duration: 1.8, delay: 0.35, ease: "power2.inOut",
+        t: 1, duration: 1.2, delay: 0.2, ease: "power2.inOut",
         onUpdate: () => revealRoutes(routeReveal.t),
         onComplete: () => covSection.classList.add("routes-in"),
       });
@@ -576,7 +576,7 @@
 
   // Recorrido de entrada según el avance del scroll (0 → 1): se dibujan los
   // departamentos y enseguida se pintan los que tienen soportes.
-  const HOLD = 0.34;
+  const HOLD = 0.6;
   const measureDraw = () => {
     const scale = covMap.clientWidth / FULL.w; // px por unidad con el país entero a la vista
     depPaths.forEach((p) => (p.dataset.len = p.getTotalLength() * scale));
@@ -597,16 +597,16 @@
     }
     showRoutes(false);
     // 1) se dibujan todos los departamentos
-    const draw = lerp01(p, 0, 0.14);
+    const draw = lerp01(p, 0, 0.2);
     depPaths.forEach((path, i) => setDash(path, +path.dataset.len || 0, clamp(draw * 1.6 - (i / depPaths.length) * 0.6, 0, 1)));
     // 2) se pintan de naranja los que tienen soportes, de sur a norte
-    const paint = lerp01(p, 0.1, 0.3);
+    const paint = lerp01(p, 0.14, 0.52);
     const lit = Math.round(paint * supportDeps.length);
     supportDeps.forEach((path, i) => path.classList.toggle("lit", i < lit));
     covCount.textContent = lit;
     legendNums.forEach((el) => (el.textContent = Math.round(+el.dataset.n * paint)));
     legendItems.forEach((li) => li.classList.add("on"));
-    if (p < 0.1) setCaption(...CAPTIONS.start);
+    if (p < 0.14) setCaption(...CAPTIONS.start);
     else setCaption(supportDeps.length ? supportDeps[Math.max(0, lit - 1)].dataset.name : CAPTIONS.start[0], CAPTIONS.paint, false);
   };
 
@@ -654,7 +654,7 @@
   let lenis; // se inicializa más abajo si hay scroll suave
   const goToMap = (f) => {
     const top = covSection.getBoundingClientRect().top + window.scrollY;
-    const y = top + (covSection.offsetHeight - innerHeight) * 0.75;
+    const y = top + (covSection.offsetHeight - innerHeight) * 0.82;
     setFilter(f, holding);
     if (lenis) lenis.scrollTo(y, { duration: 1.6 });
     else window.scrollTo({ top: y, behavior: reduceMotion ? "auto" : "smooth" });
@@ -932,7 +932,7 @@
   const covTl = gsap
     .timeline({
       scrollTrigger: {
-        trigger: "#cobertura", start: "top top", end: "bottom bottom", scrub: 0.5, invalidateOnRefresh: true,
+        trigger: "#cobertura", start: "top top", end: "bottom bottom", scrub: 0.3, invalidateOnRefresh: true,
         onRefresh: () => {
           measureDraw();
           const target = camFor(filter);

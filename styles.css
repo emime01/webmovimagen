@@ -160,7 +160,7 @@ body.on-white .nav { color: var(--orange); }
 .sc-bars i::after { content: ""; position: absolute; inset: 0; background: var(--white); transform: scaleX(var(--p, 0)); transform-origin: left; }
 
 /* ---------- Cobertura + números ---------- */
-.coverage { position: relative; height: 420vh; }
+.coverage { position: relative; height: 250vh; }
 .cov-sticky { position: sticky; top: 0; height: 100svh; display: grid; grid-template-columns: minmax(300px, 1fr) auto; column-gap: 4vw; padding: 76px var(--gutter) 28px; overflow: hidden; }
 .cov-info { display: flex; flex-direction: column; min-height: 0; }
 .cov-info .label { margin-bottom: 0; }
@@ -379,7 +379,7 @@ body.on-white .nav { color: var(--orange); }
   .products-intro p, .products-head p, .projects-head h2, .clients-head h2 { grid-column: 1 / -1; grid-row: 1; text-align: left; }
   .showcase { height: 360vh; }
   .sc-caption { bottom: 56px; }
-  .coverage { height: 400vh; }
+  .coverage { height: 230vh; }
   .cov-sticky { grid-template-columns: 1fr; grid-template-rows: auto auto auto minmax(0, 1fr) auto; row-gap: 10px; padding: 54px var(--gutter) 16px; }
   .cov-info { display: contents; }
   .cov-info .label { order: 1; }
