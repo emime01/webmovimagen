@@ -18,15 +18,19 @@ Inspirada en ghuynguyen.vercel.app, con el contenido de la web actual de Movimag
 3. Valores: confianza, flexibilidad y cercanía, con fotos de campañas flotando
 4. Números: 30 años, 50+ soportes, 19 departamentos, 5 terminales
 5. Productos: filas con nombre grande centrado (Buses, Shoppings, Pantallas gigantes, Walls, Duty Select, Ruteros) y ventana que se abre y pasa fotos al hacer scroll
-6. Proyectos: foto que se abre al hacer scroll y galería horizontal
-7. Testimonios en carrusel
-8. Clientes: logos en movimiento
-9. Contacto: formulario de cotización (abre el correo) y datos de la empresa
+6. Cobertura: mapa de Uruguay que se dibuja al hacer scroll, enciende los 19 departamentos, muestra rutas y hace zoom a Montevideo y la costa con los soportes; filtros por producto
+7. Proyectos: foto que se abre al hacer scroll y galería horizontal
+8. Testimonios en carrusel
+9. Clientes: logos en movimiento
+10. Contacto: formulario de cotización (abre el correo) y datos de la empresa
 
 Librerías por CDN: GSAP + ScrollTrigger y Lenis. Si no cargan, la página se muestra estática.
 
 Las imágenes en `assets/` vienen de movimagen.com.uy.
 
 ## Pendiente
+- Listado real de soportes para el mapa (hoy: 3 walls y 2 aeropuertos con coordenadas aproximadas, en `SITES` de main.js)
 - Conectar el formulario a un backend (hoy arma un mail a info@movimagen.com)
 - Fotos de mayor resolución para los proyectos (las actuales son de 400 px)
+
+Límites de departamentos y rutas: Natural Earth (dominio público).

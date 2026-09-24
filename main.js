@@ -118,6 +118,8 @@
     aboutWords.flat().forEach((w) => w.classList.add("on"));
     $$("[data-count]").forEach(countUp);
     $$(".sc-slide").forEach((s) => (s.style.clipPath = "none"));
+    $$(".m-deps path").forEach((p) => p.classList.add("lit"));
+    $$(".m-roads path").forEach((p) => (p.style.opacity = 0.85));
     updateTheme();
     return;
   }
@@ -359,6 +361,103 @@
     sc.fromTo($("img", s), { "--s": 1.3 }, { "--s": 1, duration: 0.2, ease: "none" }, at);
   });
   sc.to({}, { duration: 0.001 }, 1);
+
+  /* ---------- Cobertura: mapa de Uruguay ---------- */
+  // Proyección igual a la usada para generar el SVG (Natural Earth, dominio público).
+  const LON0 = -58.5, LAT0 = -30, COS = Math.cos((32.5 * Math.PI) / 180), K = 100;
+  const project = (lon, lat) => [(lon - LON0) * COS * K, (LAT0 - lat) * K];
+  // TODO: reemplazar por el listado real de soportes (coordenadas aproximadas por esquina).
+  const SITES = [
+    { type: "walls", name: "Wall Av. Italia", addr: "Av. Italia y Caldas", lon: -56.11, lat: -34.886, img: "assets/hero/home.jpg", pos: "above" },
+    { type: "walls", name: "Wall Batlle y Ordóñez", addr: "Av. José Batlle y Ordóñez y Av. Rivera", lon: -56.137, lat: -34.898, img: "assets/hero/9691.jpg", pos: "below" },
+    { type: "walls", name: "Wall 18 de Julio", addr: "Av. 18 de Julio y Roxlo", lon: -56.172, lat: -34.9025, img: "assets/proyectos/schneck.png", pos: "left" },
+    { type: "duty", name: "Aeropuerto de Carrasco", addr: "Duty Select · pantallas en free shop", lon: -56.0308, lat: -34.8384, img: "assets/video.jpg", pos: "right", label: "Carrasco" },
+    { type: "duty", name: "Aeropuerto de Punta del Este", addr: "Duty Select · pantallas en free shop", lon: -55.0943, lat: -34.8551, img: "assets/video.jpg", pos: "left", late: true, label: "Punta del Este" },
+  ];
+  const mapSvg = $("#mapSvg");
+  const covMap = $("#covMap");
+  const depPaths = $$(".m-deps path");
+  const pins = SITES.map((site) => {
+    const el = document.createElement("div");
+    el.className = `pin ${site.pos}`;
+    el.dataset.type = site.type;
+    el.innerHTML = `<i></i><b>(${site.label || site.name.replace(/^Wall /, "")})</b><div class="pin-card"><img src="${site.img}" alt="" /><div><strong>${site.name}</strong><span>${site.addr}</span></div></div>`;
+    el.addEventListener("click", () => { pins.forEach((p) => p.el !== el && p.el.classList.remove("open")); el.classList.toggle("open"); });
+    $("#covPins").appendChild(el);
+    return { el, site, xy: project(site.lon, site.lat) };
+  });
+  const placePins = () => {
+    const ctm = mapSvg.getScreenCTM();
+    const box = covMap.getBoundingClientRect();
+    if (!ctm) return;
+    const pt = mapSvg.createSVGPoint();
+    pins.forEach((p) => {
+      pt.x = p.xy[0]; pt.y = p.xy[1];
+      const s = pt.matrixTransform(ctm);
+      p.el.style.transform = `translate(${s.x - box.left}px, ${s.y - box.top}px)`;
+    });
+  };
+
+  // Cámara: todo el país → Montevideo → costa sur
+  const RATIO = 502 / 459;
+  const cam = { cx: 229.5, cy: 251, w: 459 };
+  const applyCam = () => {
+    const h = cam.w * RATIO;
+    mapSvg.setAttribute("viewBox", `${cam.cx - cam.w / 2} ${cam.cy - h / 2} ${cam.w} ${h}`);
+    placePins();
+  };
+  const [mvdX, mvdY] = project(-56.1, -34.875);
+  const [surX, surY] = project(-55.6, -34.82);
+
+  const covCount = $("#covCount"), covDep = $("#covDep"), covZone = $("#covZone");
+  const drawLens = () => {
+    const scale = mapSvg.getScreenCTM()?.a || 1;
+    depPaths.forEach((p) => { const l = p.getTotalLength() * scale; p.dataset.len = l; if (lastLit < 1) { p.style.strokeDasharray = `${l} ${l}`; p.style.strokeDashoffset = l; } });
+  };
+  let lastLit = -1;
+  const covTl = gsap.timeline({
+    scrollTrigger: {
+      trigger: "#cobertura", start: "top top", end: "bottom bottom", scrub: 0.5,
+      onRefresh: () => { drawLens(); applyCam(); },
+      onUpdate: (st) => {
+        const p = st.progress;
+        // 1) trazo de los departamentos
+        const draw = gsap.utils.clamp(0, 1, p / 0.2);
+        depPaths.forEach((path, i) => {
+          const local = gsap.utils.clamp(0, 1, draw * 1.6 - (i / depPaths.length) * 0.6);
+          const len = +path.dataset.len;
+          path.style.strokeDashoffset = local >= 1 ? 0 : len * (1 - local);
+          path.style.strokeDasharray = local >= 1 ? "none" : `${len} ${len}`;
+        });
+        // 2) se encienden uno por uno, de Montevideo al norte
+        const lit = Math.round(gsap.utils.clamp(0, 1, (p - 0.2) / 0.28) * depPaths.length);
+        if (lit !== lastLit) {
+          lastLit = lit;
+          depPaths.forEach((path, i) => path.classList.toggle("lit", i < lit));
+          covCount.textContent = lit;
+          covDep.textContent = lit === 0 ? "\u00a0" : lit === depPaths.length ? "Todo el país" : depPaths[lit - 1].dataset.name;
+        }
+        // 4-5) puntos según la zona
+        pins.forEach((pn) => pn.el.classList.toggle("show", p > (pn.site.late ? 0.9 : 0.72)));
+        $("#cobertura").classList.toggle("far", p > 0.86);
+        covZone.textContent = p > 0.84 ? "(Costa sur)" : p > 0.64 ? "(Montevideo)" : "(Uruguay)";
+      },
+    },
+  });
+  covTl
+    .to(".m-roads path", { opacity: 0.85, duration: 0.08, ease: "none" }, 0.5)
+    .to(cam, { cx: mvdX, cy: mvdY, w: 34, duration: 0.16, ease: "power2.inOut", onUpdate: applyCam }, 0.6)
+    .to(cam, { cx: surX, cy: surY, w: 150, duration: 0.12, ease: "power2.inOut", onUpdate: applyCam }, 0.84)
+    .to({}, { duration: 0.04 }, 0.96);
+  window.addEventListener("resize", () => requestAnimationFrame(applyCam));
+
+  $("#covFilters").addEventListener("click", (e) => {
+    const btn = e.target.closest("button");
+    if (!btn) return;
+    $$("#covFilters button").forEach((b) => b.classList.toggle("on", b === btn));
+    const cov = $("#cobertura");
+    ["walls", "duty", "rutas"].forEach((f) => cov.classList.toggle(`f-${f}`, btn.dataset.f === f));
+  });
 
   /* ---------- Galería horizontal ---------- */
   const track = $("#galleryTrack");
