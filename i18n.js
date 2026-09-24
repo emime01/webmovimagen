@@ -28,6 +28,7 @@ window.I18N = {
     "values.title": "Trust, flexibility, closeness:<br />what defines us.",
 
     "cov.label": "Coverage",
+    "cov.title": "The company with the widest coverage in the country",
     "cov.years": "Years of experience",
     "cov.types": "Media formats",
     "cov.deps": "Departments",
