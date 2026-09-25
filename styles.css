@@ -125,7 +125,7 @@ body.on-white .nav { color: var(--orange); }
 .float:nth-child(4n) { width: 19vw; aspect-ratio: 3/2; margin: -6.3vw 0 0 -9.5vw; }
 
 /* ---------- Productos ---------- */
-.products { position: relative; padding: 16vh 0 0; }
+.products { position: relative; padding: 16vh 0 14vh; }
 .big-marquee { overflow: hidden; }
 .bm-row { display: flex; align-items: center; gap: 4vw; width: max-content; font-size: clamp(88px, 19vw, 300px); font-weight: 500; line-height: 1; letter-spacing: -0.075em; will-change: transform; }
 .bm-row i { display: block; width: 14vw; height: 0.03em; min-height: 3px; background: currentColor; }

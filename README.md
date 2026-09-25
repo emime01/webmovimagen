@@ -14,14 +14,15 @@ Inspirada en ghuynguyen.vercel.app, con el contenido de la web actual de Movimag
 
 1. Carga: ventana con fotos de campañas que se agranda hasta ser la portada
 2. Portada: la ciudad ilustrada de Movimagen se dibuja sola desde el centro de la ruta (WebGL) y se ilumina donde pasa el mouse; "+30 años" asoma por detrás de los edificios. Sin WebGL se ve la ilustración quieta
-3. Sobre nosotros: texto que se ilumina palabra por palabra al hacer scroll
-4. Valores: confianza, flexibilidad y cercanía, con fotos que salen desde el centro
-5. Cobertura: los números (30 años, 50+ soportes, departamentos con soportes, 5 terminales) junto al mapa. Se pintan de naranja solo los departamentos con soportes; al pasar por uno se ve un resumen de lo que hay. Las rutas con sus carteles aparecen solo al elegir Ruteros en Productos
-6. Productos: filas con cinta animada al pasar el mouse. Al hacer clic en un producto (menos Buses) se vuelve al mapa mostrando solo las ubicaciones de ese tipo; el botón "Ver todos los soportes" quita el filtro
-7. Proyectos: galería horizontal
-8. Testimonios en carrusel
-9. Clientes: logos en movimiento
-10. Contacto: formulario de cotización (llega por mail a info@movimagen.com mediante FormSubmit, con respuesta automática a quien consulta) y datos de la empresa. Botón fijo de WhatsApp (+598 94 143 599) en toda la página
+3. En la calle: "Soportes que la ciudad mira todos los días", la ventana que se abre y pasa fotos de soportes
+4. Sobre nosotros: texto que se ilumina palabra por palabra al hacer scroll
+5. Valores: confianza, flexibilidad y cercanía, con fotos que salen desde el centro
+6. Cobertura: los números (30 años, 50+ soportes, departamentos con soportes, 5 terminales) junto al mapa. Se pintan de naranja solo los departamentos con soportes; al pasar por uno se ve un resumen de lo que hay. Las rutas con sus carteles aparecen solo al elegir Ruteros en Productos
+7. Productos: filas con cinta animada al pasar el mouse. Al hacer clic en un producto (menos Buses) se vuelve al mapa mostrando solo las ubicaciones de ese tipo; el botón "Ver todos los soportes" quita el filtro
+8. Proyectos: galería horizontal
+9. Testimonios en carrusel
+10. Clientes: logos en movimiento
+11. Contacto: formulario de cotización (llega por mail a info@movimagen.com mediante FormSubmit, con respuesta automática a quien consulta) y datos de la empresa. Botón fijo de WhatsApp (+598 94 143 599) en toda la página
 
 **Activar el formulario:** la primera consulta que se envíe hace que FormSubmit mande un mail a info@movimagen.com con un botón "Activate". Hay que tocarlo una vez; desde ahí las consultas llegan solas. La dirección y el número de WhatsApp están al principio de las secciones Formulario y WhatsApp de `main.js`.
 
