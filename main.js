@@ -256,27 +256,90 @@
   window.addEventListener("scroll", queueTheme, { passive: true });
 
   /* ---------- Formulario ---------- */
-  // Sin backend: arma el correo con todos los datos para info@movimagen.com
+  // Cada consulta se manda por FormSubmit (formsubmit.co) a info@movimagen.com, y la persona recibe
+  // una respuesta automática. La primera vez, FormSubmit manda un mail a esa casilla para activar
+  // el formulario. Si el envío falla, se ofrece abrir el correo con los datos ya cargados.
+  const FORM_TO = "info@movimagen.com";
+  const FORM_ENDPOINT = `https://formsubmit.co/ajax/${FORM_TO}`;
+  const quoteForm = $("#quoteForm");
+  const submitBtn = $(".submit", quoteForm);
   const formNote = $("#formNote");
-  $("#quoteForm").addEventListener("submit", (e) => {
+  let formState = "";
+  const showFormNote = () => {
+    formNote.classList.toggle("is-error", formState === "error");
+    formNote.innerHTML = !formState ? "" : formState === "error"
+      ? T("form.error", { mail: `<a href="#" class="form-mail">${FORM_TO}</a>` })
+      : T(`form.${formState}`);
+  };
+  const formData = () => {
+    const d = Object.fromEntries(new FormData(quoteForm));
+    const unit = quoteForm.unidad.selectedOptions[0]?.textContent || d.unidad;
+    return {
+      d,
+      rows: [
+        [T("mail.name"), d.nombre],
+        [T("mail.email"), d.email],
+        [T("mail.phone"), d.telefono || "-"],
+        [T("mail.term"), `${d.plazo} ${unit}`],
+        [T("mail.start"), d.inicio],
+        [T("mail.end"), d.fin],
+        [T("mail.budget"), `$ ${d.inversion}`],
+      ],
+    };
+  };
+  const openMail = () => {
+    const { d, rows } = formData();
+    const body = [...rows.map(([k, v]) => `${k}: ${v}`), "", d.mensaje].join("\n");
+    window.location.href = `mailto:${FORM_TO}?subject=${encodeURIComponent(T("mail.subject", { name: d.nombre }))}&body=${encodeURIComponent(body)}`;
+  };
+  formNote.addEventListener("click", (e) => { if (e.target.closest(".form-mail")) { e.preventDefault(); openMail(); } });
+  quoteForm.addEventListener("submit", async (e) => {
     e.preventDefault();
-    const form = e.target;
-    const d = Object.fromEntries(new FormData(form));
-    const unit = form.unidad.selectedOptions[0]?.textContent || d.unidad;
-    const body = [
-      `${T("mail.name")}: ${d.nombre}`,
-      `${T("mail.email")}: ${d.email}`,
-      `${T("mail.phone")}: ${d.telefono || "-"}`,
-      `${T("mail.term")}: ${d.plazo} ${unit}`,
-      `${T("mail.start")}: ${d.inicio}  ·  ${T("mail.end")}: ${d.fin}`,
-      `${T("mail.budget")}: $ ${d.inversion}`,
-      "",
-      d.mensaje,
-    ].join("\n");
-    window.location.href = `mailto:info@movimagen.com?subject=${encodeURIComponent(T("mail.subject", { name: d.nombre }))}&body=${encodeURIComponent(body)}`;
-    formNote.textContent = T("form.thanks");
+    const { d, rows } = formData();
+    if (d._honey) return; // lo completó un robot
+    formState = "sending";
+    showFormNote();
+    submitBtn.disabled = true;
+    const payload = Object.fromEntries(rows);
+    payload[T("mail.message")] = d.mensaje;
+    Object.assign(payload, {
+      email: d.email, // FormSubmit lo usa para responder y para la respuesta automática
+      _subject: T("mail.subject", { name: d.nombre }),
+      _template: "table",
+      _captcha: "false",
+      _autoresponse: T("form.autoresponse"),
+    });
+    try {
+      const res = await fetch(FORM_ENDPOINT, { method: "POST", headers: { "Content-Type": "application/json", Accept: "application/json" }, body: JSON.stringify(payload) });
+      const out = await res.json().catch(() => ({}));
+      if (!res.ok || String(out.success) !== "true") throw new Error(out.message || res.status);
+      formState = "thanks";
+      quoteForm.reset();
+    } catch (err) {
+      formState = "error";
+    }
+    submitBtn.disabled = false;
+    showFormNote();
   });
-  onLang(() => { if (formNote.textContent) formNote.textContent = T("form.thanks"); });
+  onLang(showFormNote);
+
+  /* ---------- WhatsApp ---------- */
+  // Botón fijo: abre el chat con un mensaje inicial en el idioma activo.
+  // Sobre fondo naranja se ve blanco; sobre blanco, naranja.
+  const waButton = $("#waButton");
+  const WA_NUMBER = "59894143599";
+  const setWaLink = () => (waButton.href = `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(T("wa.message"))}`);
+  setWaLink();
+  onLang(setWaLink);
+  let waQueued = false;
+  const updateWa = () => {
+    waQueued = false;
+    const r = waButton.getBoundingClientRect();
+    waButton.classList.toggle("on-white", isWhiteAt(r.left - 4, r.top + r.height / 2));
+  };
+  const queueWa = () => { if (!waQueued) { waQueued = true; requestAnimationFrame(updateWa); } };
+  window.addEventListener("scroll", queueWa, { passive: true });
+  window.addEventListener("resize", queueWa);
 
   /* ---------- Testimonios ---------- */
   const tItems = $$(".t-item");
@@ -797,6 +860,7 @@
     updateCoverage(1);
     window.addEventListener("resize", applyCam);
     updateTheme();
+    queueWa();
     return;
   }
 
@@ -805,7 +869,7 @@
   /* ---------- Scroll suave ---------- */
   if (!reduceMotion && typeof window.Lenis !== "undefined") {
     lenis = new Lenis({ lerp: 0.09 });
-    lenis.on("scroll", () => { ScrollTrigger.update(); queueTheme(); });
+    lenis.on("scroll", () => { ScrollTrigger.update(); queueTheme(); queueWa(); });
     gsap.ticker.add((t) => lenis.raf(t * 1000));
     gsap.ticker.lagSmoothing(0);
     lenis.stop();
@@ -830,6 +894,7 @@
     lenis && lenis.start();
     ScrollTrigger.refresh();
     updateTheme();
+    queueWa();
   };
   const intro = gsap.timeline({ delay: 0.3 });
   intro.from(box, { scale: 0.6, opacity: 0, duration: 0.6, ease: "expo.out" });

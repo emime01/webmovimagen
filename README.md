@@ -21,7 +21,9 @@ Inspirada en ghuynguyen.vercel.app, con el contenido de la web actual de Movimag
 7. Proyectos: galería horizontal
 8. Testimonios en carrusel
 9. Clientes: logos en movimiento
-10. Contacto: formulario de cotización (abre el correo) y datos de la empresa
+10. Contacto: formulario de cotización (llega por mail a info@movimagen.com mediante FormSubmit, con respuesta automática a quien consulta) y datos de la empresa. Botón fijo de WhatsApp (+598 94 143 599) en toda la página
+
+**Activar el formulario:** la primera consulta que se envíe hace que FormSubmit mande un mail a info@movimagen.com con un botón "Activate". Hay que tocarlo una vez; desde ahí las consultas llegan solas. La dirección y el número de WhatsApp están al principio de las secciones Formulario y WhatsApp de `main.js`.
 
 Librerías por CDN: GSAP + ScrollTrigger y Lenis. Si no cargan, la página se muestra estática.
 
@@ -44,6 +46,5 @@ La ilustración original está en `tools/portada-original.webp`. `tools/generar-
 
 ## Pendiente
 - Administrador de contenidos (en pausa): los textos ya están organizados por clave en `i18n.js` y `data-i18n`, así que se puede conectar a una base de datos cuando se retome
-- Conectar el formulario a un backend (hoy arma un mail a info@movimagen.com)
 - Fotos de mayor resolución para los proyectos (las actuales son de 400 px)
 

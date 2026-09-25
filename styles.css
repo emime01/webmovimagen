@@ -351,6 +351,23 @@ body.on-white .nav { color: var(--orange); }
 .submit:hover { padding-inline: 40px; }
 .submit:hover span:last-child { transform: translateX(8px); }
 .form-note { grid-column: span 3; min-height: 1.5em; margin-top: 16px; font-size: 15px; font-weight: 600; }
+.form-note a { text-decoration: underline; }
+.submit:disabled { opacity: 0.6; cursor: progress; }
+.hp { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+
+/* ---------- WhatsApp ---------- */
+.wa {
+  position: fixed; right: var(--gutter); bottom: 20px; z-index: 120;
+  display: flex; align-items: center; gap: 0; height: 52px; padding: 0 14px; border-radius: 999px;
+  background: var(--white); color: var(--orange); box-shadow: 0 6px 24px rgba(0, 0, 0, 0.18);
+  font-size: 13px; font-weight: 600; transition: background 0.3s, color 0.3s, gap 0.4s var(--ease), transform 0.4s var(--ease), opacity 0.4s;
+}
+.wa.on-white { background: var(--orange); color: var(--white); }
+.wa svg { width: 24px; height: 24px; flex-shrink: 0; fill: currentColor; }
+.wa span { max-width: 0; overflow: hidden; white-space: nowrap; transition: max-width 0.4s var(--ease); }
+.wa:hover { gap: 8px; }
+.wa:hover span { max-width: 140px; }
+body.is-loading .wa { opacity: 0; transform: translateY(20px); pointer-events: none; }
 
 /* ---------- Footer ---------- */
 .footer { padding: 12vh var(--gutter) 0; overflow: hidden; }
