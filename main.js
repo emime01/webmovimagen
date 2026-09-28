@@ -96,7 +96,9 @@
     if (old) old.remove();
     const name = li.querySelector("h3").textContent;
     const imgs = li.dataset.imgs.split(",");
-    const unit = [0, 1, 2, 3].map((i) => `<span>${name}</span><img src="${imgs[i % imgs.length]}" alt="" loading="lazy" />`).join("");
+    // Cada foto puede traer su encuadre: "foto.webp@50% 30%" (se centra en el soporte)
+    const img = (entry) => { const [src, pos] = entry.split("@"); return `<img src="${src}" alt="" loading="lazy"${pos ? ` style="object-position:${pos}"` : ""} />`; };
+    const unit = [0, 1, 2, 3].map((i) => `<span>${name}</span>${img(imgs[i % imgs.length])}`).join("");
     li.insertAdjacentHTML("beforeend", `<div class="p-mq" aria-hidden="true"><div class="p-mq-inner"><div class="p-mq-track">${unit}${unit}</div></div></div>`);
     if (hasGsap) {
       const on = li.classList.contains("active");

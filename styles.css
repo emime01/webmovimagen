@@ -109,7 +109,7 @@ body.on-white .nav { color: var(--orange); }
 [data-words] .w.on { color: var(--fg); }
 
 /* ---------- Valores ---------- */
-.values { position: relative; height: 380vh; }
+.values { position: relative; height: 310vh; }
 .values-sticky { position: sticky; top: 0; height: 100svh; display: grid; place-items: center; overflow: hidden; }
 .circles { position: absolute; width: min(74vw, 74vh); height: auto; overflow: visible; }
 .circles circle { fill: none; stroke: rgba(255,255,255,0.45); stroke-width: 1; vector-effect: non-scaling-stroke; }
@@ -320,8 +320,8 @@ body.on-white .nav { color: var(--orange); }
 .logo-row { display: flex; gap: 12px; width: max-content; animation: slide 50s linear infinite; }
 .logo-row.rev { animation-direction: reverse; }
 .logo-marquee:hover .logo-row { animation-play-state: paused; }
-.logo-chip { width: 200px; height: 120px; flex-shrink: 0; background: var(--white); display: grid; place-items: center; padding: 18px; overflow: hidden; }
-.logo-chip img { max-width: 100%; max-height: 100%; object-fit: contain; mix-blend-mode: multiply; }
+.logo-chip { width: 200px; height: 120px; flex-shrink: 0; background: var(--white); padding: 20px 24px; overflow: hidden; }
+.logo-chip img { width: 100%; height: 100%; object-fit: contain; object-position: center; mix-blend-mode: multiply; }
 @keyframes slide { to { transform: translateX(-50%); } }
 
 /* ---------- Contacto ---------- */
