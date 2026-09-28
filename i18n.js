@@ -17,6 +17,7 @@ window.I18N = {
     "nav.cta": "Get a quote",
 
     "hero.years": "years",
+    "hero.title": "Movimagen: outdoor advertising all over Uruguay",
     "hero.left": "Outdoor advertising<br />all over Uruguay.",
     "hero.right": "Over 30 years connecting<br />brands with people.",
 

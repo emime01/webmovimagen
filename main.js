@@ -963,11 +963,9 @@
   frames.forEach((img, i) => {
     intro.add(() => { frames.forEach((f) => f.classList.remove("on")); img.classList.add("on"); }, i === 0 ? ">" : `>${STEP}`);
   });
-  // Al abrirse la portada: el logo sube desde el centro, la ciudad se dibuja y el 30 sale por detrás
+  // Al abrirse la portada: la ciudad se dibuja y el +30 sale por detrás
+  // (el logo ya está en la ilustración, así que el de la carga se desvanece al agrandarse la ventana)
   const revealHero = () => {
-    const logo = $(".hero-logo");
-    const r = logo.getBoundingClientRect();
-    gsap.from(logo, { y: innerHeight / 2 - (r.top + r.height / 2), duration: 1.3, ease: "expo.inOut" });
     if ($(".hero").classList.contains("is-gl")) {
       heroCity.whenReady(() => gsap.to(heroCity, { progress: 1.15, duration: reduceMotion ? 0 : 2.8, ease: "power1.inOut", onUpdate: heroCity.render }));
     } else {
@@ -978,6 +976,7 @@
   intro
     .to(".loader-final", { opacity: 1, duration: 0.25 }, `>${STEP}`)
     .to(box, { width: () => innerWidth, height: () => innerHeight, duration: 1.2, ease: "expo.inOut" }, ">0.15")
+    .to(".loader-logo", { opacity: 0, scale: 0.9, duration: 0.6, ease: "power2.in" }, "<0.5")
     .add(finishLoading)
     .add(revealHero)
     .to(".fade-in", { opacity: 1, duration: 1, stagger: 0.08 }, "<1.2");
@@ -1055,7 +1054,6 @@
   const heroOut = { trigger: ".hero", start: "top top", end: "bottom top", scrub: true };
   gsap.to(".hero-city", { scale: 1.14, transformOrigin: "50% 74%", ease: "none", scrollTrigger: { ...heroOut } });
   gsap.to(".hero-glow", { yPercent: 24, ease: "none", scrollTrigger: { ...heroOut } });
-  gsap.to(".hero-logo", { yPercent: -120, ease: "none", scrollTrigger: { ...heroOut } });
 
   /* ---------- Sobre nosotros: palabras que se encienden ---------- */
   aboutWords.forEach((words) => {
@@ -1260,7 +1258,7 @@
   gsap.to(track, {
     x: () => -distance(),
     ease: "none",
-    scrollTrigger: { trigger: "#gallery", start: "center center", end: () => `+=${distance()}`, pin: "#proyectos", scrub: 1, invalidateOnRefresh: true, refreshPriority: 1 },
+    scrollTrigger: { trigger: "#proyectos", start: "top top", end: () => `+=${distance()}`, pin: "#proyectos", scrub: 1, invalidateOnRefresh: true, refreshPriority: 1 },
   });
 
   /* ---------- Contacto ---------- */

@@ -100,8 +100,7 @@ body.on-white .nav .nav-cta:hover { background: var(--orange); color: var(--whit
   display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; column-gap: 24px;
   padding: calc(56px + 7vh) var(--gutter) 0;
 }
-.hero-logo { position: relative; z-index: 2; grid-column: 2; grid-row: 1; }
-.hero-logo img { width: clamp(150px, 16vw, 240px); }
+.visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 .hero-side { position: relative; z-index: 2; grid-row: 1; font-size: 13px; font-weight: 500; }
 .hero-left { grid-column: 1; }
 .hero-right { grid-column: 3; text-align: right; }
@@ -318,7 +317,7 @@ body.on-white .nav .nav-cta:hover { background: var(--orange); color: var(--whit
 
 /* ---------- Proyectos ---------- */
 .projects { position: relative; }
-.projects-head { padding-top: 16vh; padding-bottom: 4vh; }
+.projects-head { padding-top: max(96px, 14vh); padding-bottom: 2vh; }
 .projects-head h2, .clients-head h2 { text-align: center; font-size: clamp(20px, 2vw, 30px); line-height: 1.15; letter-spacing: -0.035em; font-weight: 600; }
 .gallery { position: relative; overflow: hidden; }
 .gallery-track { display: flex; gap: 2vw; padding: 10vh var(--gutter) 16vh; width: max-content; will-change: transform; }
@@ -432,7 +431,6 @@ body.is-loading .wa { opacity: 0; transform: translateY(20px); pointer-events: n
   .hero { --city-w: 280vw; }
   .hero-num { font-size: 42vw; }
   .hero-sky { grid-template-columns: 1fr 1fr; row-gap: 11vh; column-gap: 12px; padding-top: 76px; }
-  .hero-logo { grid-column: 1 / -1; grid-row: 2; justify-self: center; }
   .hero-side { font-size: 12px; }
   .hero-left { grid-column: 1; }
   .hero-right { grid-column: 2; }
