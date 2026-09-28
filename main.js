@@ -953,7 +953,11 @@
     updateTheme();
     queueWa();
   };
-  const intro = gsap.timeline({ delay: 0.3 });
+  // La animación arranca cuando cargaron las fotos de la ventana (o a los 3 s como máximo),
+  // así con conexiones lentas no pasa por cuadros vacíos
+  const intro = gsap.timeline({ paused: true });
+  const loaded = frames.map((img) => (img.complete && img.naturalWidth ? Promise.resolve() : new Promise((ok) => { img.addEventListener("load", ok, { once: true }); img.addEventListener("error", ok, { once: true }); })));
+  Promise.race([Promise.all(loaded), new Promise((ok) => setTimeout(ok, 3000))]).then(() => gsap.delayedCall(0.3, () => intro.play()));
   intro.from(box, { scale: 0.6, opacity: 0, duration: 0.6, ease: "expo.out" });
   const STEP = reduceMotion ? 0.02 : 0.16;
   frames.forEach((img, i) => {
