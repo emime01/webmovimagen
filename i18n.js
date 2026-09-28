@@ -86,7 +86,7 @@ window.I18N = {
     "sc.alt4": "Giant screen above a restaurant on a street corner",
 
     "projects.latest": "Latest",
-    "projects.title": "Campaigns that made<br />the city look",
+    "projects.title": "Projects seen<br />all over the country",
     "projects.label": "Projects",
 
     "testimonials.label": "What our clients say",
