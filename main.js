@@ -1060,6 +1060,23 @@
     });
   });
 
+  /* ---------- Equipo: las fotos se abren en círculo, una detrás de otra ---------- */
+  if (!reduceMotion) {
+    const members = $$(".member");
+    gsap.set($$(".member img"), { clipPath: "circle(0% at 50% 50%)", scale: 1.25 });
+    gsap.set($$(".member figcaption"), { y: 24, opacity: 0 });
+    gsap.set(".team-title", { yPercent: 60, opacity: 0 });
+    ScrollTrigger.create({
+      trigger: ".team", start: "top 78%", once: true,
+      onEnter: () => {
+        gsap.to(".team-title", { yPercent: 0, opacity: 1, duration: 1, ease: "expo.out" });
+        // En pantalla se ven las primeras; esas van con más ritmo y el resto sale junto
+        gsap.to($$(".member img"), { clipPath: "circle(50% at 50% 50%)", scale: 1, duration: 1.3, ease: "expo.out", stagger: { each: 0.09, amount: Math.min(1.1, members.length * 0.09) }, clearProps: "clipPath" });
+        gsap.to($$(".member figcaption"), { y: 0, opacity: 1, duration: 0.9, ease: "expo.out", delay: 0.25, stagger: { each: 0.09, amount: Math.min(1.1, members.length * 0.09) } });
+      },
+    });
+  }
+
   /* ---------- Valores: imágenes flotando ---------- */
   // Las fotos nacen chicas en el centro y salen hacia los bordes agrandándose,
   // una detrás de otra, como si vinieran hacia la pantalla.
