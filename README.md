@@ -15,9 +15,9 @@ Inspirada en ghuynguyen.vercel.app, con el contenido de la web actual de Movimag
 1. Carga: ventana con fotos de campañas que se agranda hasta ser la portada
 2. Portada: la ciudad ilustrada de Movimagen se dibuja sola desde el centro de la ruta (WebGL) y se ilumina donde pasa el mouse; "+30 años" asoma por detrás de los edificios. Sin WebGL se ve la ilustración quieta
 3. En la calle: "Soportes que la ciudad mira todos los días", la ventana que se abre y pasa fotos de soportes
-4. Sobre nosotros: texto que se ilumina palabra por palabra al hacer scroll
+4. Sobre nosotros: texto que se ilumina palabra por palabra al hacer scroll. Debajo, "Conocé al equipo": fila con las 15 personas del equipo que se desliza hacia la derecha (con el dedo, el trackpad o arrastrando con el mouse). Las fotos están en `assets/equipo/`
 5. Valores: confianza, flexibilidad y cercanía, con fotos que salen desde el centro
-6. Cobertura: los números (30 años, 50+ soportes, departamentos con soportes, 5 terminales) junto al mapa. Se pintan de naranja solo los departamentos con soportes; al pasar por uno se ve un resumen de lo que hay. Las rutas con sus carteles aparecen solo al elegir Ruteros en Productos
+6. Cobertura: los números (30 años, +100 soportes, departamentos con soportes, 5 terminales) junto al mapa. Se pintan de naranja solo los departamentos con soportes; al pasar por uno se ve un resumen de lo que hay. Las rutas con sus carteles aparecen solo al elegir Ruteros en Productos
 7. Productos: filas con cinta animada al pasar el mouse. Al hacer clic en un producto (menos Buses) se vuelve al mapa mostrando solo las ubicaciones de ese tipo; el botón "Ver todos los soportes" quita el filtro
 8. Proyectos: galería horizontal
 9. Testimonios en carrusel

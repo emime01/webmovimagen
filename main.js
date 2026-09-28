@@ -74,6 +74,53 @@
     splitQuotes();
   });
 
+  /* ---------- Equipo: se desliza con el dedo, la ruedita o arrastrando ---------- */
+  const teamTrack = $("#teamTrack");
+  const teamBar = $("#teamBar");
+  const teamProgress = () => {
+    const max = teamTrack.scrollWidth - teamTrack.clientWidth;
+    const seen = teamTrack.clientWidth / teamTrack.scrollWidth;
+    teamBar.style.setProperty("--p", max > 0 ? seen + (1 - seen) * (teamTrack.scrollLeft / max) : 1);
+  };
+  teamTrack.addEventListener("scroll", teamProgress, { passive: true });
+  window.addEventListener("resize", teamProgress);
+  teamProgress();
+  // Con mouse: arrastrar la fila (con inercia suave al soltar)
+  let drag = null;
+  teamTrack.addEventListener("pointerdown", (e) => {
+    if (e.pointerType !== "mouse" || e.button !== 0) return;
+    drag = { x: e.clientX, left: teamTrack.scrollLeft, v: 0, t: performance.now(), moved: false };
+    teamTrack.setPointerCapture(e.pointerId);
+  });
+  teamTrack.addEventListener("pointermove", (e) => {
+    if (!drag) return;
+    const dx = e.clientX - drag.x;
+    if (Math.abs(dx) > 3) { drag.moved = true; teamTrack.classList.add("dragging"); }
+    const now = performance.now();
+    const left = drag.left - dx;
+    drag.v = (left - teamTrack.scrollLeft) / Math.max(1, now - drag.t);
+    drag.t = now;
+    teamTrack.scrollLeft = left;
+  });
+  const endDrag = () => {
+    if (!drag) return;
+    const v = drag.v;
+    drag = null;
+    teamTrack.classList.remove("dragging");
+    if (!reduceMotion && Math.abs(v) > 0.2) teamTrack.scrollBy({ left: v * 260, behavior: "smooth" });
+  };
+  teamTrack.addEventListener("pointerup", endDrag);
+  teamTrack.addEventListener("pointercancel", endDrag);
+  // Gesto horizontal del trackpad: mueve la fila (el scroll suave de la página no lo toma).
+  // La ruedita vertical sigue bajando la página.
+  teamTrack.addEventListener("wheel", (e) => { if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) e.stopPropagation(); }, { passive: true });
+  teamTrack.addEventListener("keydown", (e) => {
+    if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
+      e.preventDefault();
+      teamTrack.scrollBy({ left: (e.key === "ArrowRight" ? 1 : -1) * ($(".member", teamTrack).offsetWidth + 24), behavior: reduceMotion ? "auto" : "smooth" });
+    }
+  });
+
   /* ---------- Logos de clientes y fotos de proyectos ---------- */
   const LOGOS = Array.from({ length: 33 }, (_, i) => `assets/clientes/c${i + 1}.${i < 21 ? "png" : "jpg"}`);
   $("#logoRows").innerHTML = [LOGOS.slice(0, 17), LOGOS.slice(17)]
@@ -373,12 +420,12 @@
   /* ---------- Contadores ---------- */
   const countUp = (el) => {
     const end = +el.dataset.count;
-    const suffix = el.dataset.suffix || "";
-    if (reduceMotion) { el.textContent = end + suffix; return; }
+    const suffix = el.dataset.suffix || "", prefix = el.dataset.prefix || "";
+    if (reduceMotion) { el.textContent = prefix + end + suffix; return; }
     const start = performance.now();
     const step = (now) => {
       const p = Math.min((now - start) / 1800, 1);
-      el.textContent = Math.round(end * (1 - Math.pow(1 - p, 4))) + (p === 1 ? suffix : "");
+      el.textContent = (p === 1 ? prefix : "") + Math.round(end * (1 - Math.pow(1 - p, 4))) + (p === 1 ? suffix : "");
       if (p < 1) requestAnimationFrame(step);
     };
     requestAnimationFrame(step);
@@ -951,6 +998,7 @@
   $$("[data-cursor]").forEach((el) => bindCursor(el, el.dataset.cursor));
   $$(".g-item").forEach((el) => bindCursor(el, "view"));
   mapRows.forEach((el) => bindCursor(el, "map"));
+  if (finePointer) bindCursor(teamTrack, "drag");
 
   /* ---------- Portada: luz que sigue al mouse ---------- */
   // La misma luz ilumina el 30 y las líneas de la ciudad
@@ -1089,11 +1137,9 @@
   }
 
   /* ---------- Ventana de productos: se abre y pasa fotos ---------- */
-  const SLIDE_KEYS = ["sc.walls", "sc.walls", "sc.screens", "sc.screens"];
   const frame = $("#scFrame");
   const slides = $$(".sc-slide");
   const scBars = $$("#scBars i");
-  const scName = $("#scName");
   const scIndex = $("#scIndex");
   const win = { t: 34, x: 12, r: 50 };
   const applyWin = () => {
@@ -1107,12 +1153,9 @@
   const setSlide = (i) => {
     if (i === current) return;
     current = i;
-    scName.textContent = T(SLIDE_KEYS[i]);
     scIndex.textContent = `${String(i + 1).padStart(2, "0")}/${String(slides.length).padStart(2, "0")}`;
-    gsap.fromTo(scName, { yPercent: 60, opacity: 0 }, { yPercent: 0, opacity: 1, duration: 0.6, ease: "expo.out" });
   };
   setSlide(0);
-  onLang(() => (scName.textContent = T(SLIDE_KEYS[Math.max(0, current)])));
 
   const sc = gsap.timeline({
     scrollTrigger: {

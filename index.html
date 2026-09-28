@@ -86,7 +86,6 @@
             <figure class="sc-slide"><img src="assets/hero/9692.jpg" alt="Pantalla gigante de Conaprole sobre una avenida con tránsito" data-i18n-attr="alt:sc.alt3" /></figure>
             <figure class="sc-slide"><img src="assets/hero/9693.jpg" alt="Pantalla gigante sobre un local de comida en una esquina" data-i18n-attr="alt:sc.alt4" /></figure>
             <div class="sc-caption">
-              <span id="scName">Walls</span>
               <span id="scIndex">01/04</span>
             </div>
             <div class="sc-bars" id="scBars"><i></i><i></i><i></i><i></i></div>
@@ -104,6 +103,31 @@
       <p class="about-sub" data-words data-i18n="about.sub">
         Nuestro propósito es construir un entorno donde cada colaborador quiera estar, donde los clientes nos elijan por nuestra calidad de servicio, los proveedores nos vean como socios y todos, juntos, agreguemos valor a la sociedad.
       </p>
+      <!-- Equipo: se desliza hacia la derecha -->
+      <div class="team">
+        <div class="team-head">
+          <h2 class="team-title" data-i18n="team.title">Conocé al equipo</h2>
+          <p class="team-hint" aria-hidden="true"><span data-i18n="team.hint">Deslizá</span> <i>→</i></p>
+        </div>
+        <div class="team-track" id="teamTrack" tabindex="0" role="region" aria-label="Equipo de Movimagen" data-i18n-attr="aria-label:team.aria">
+          <figure class="member"><img src="assets/equipo/gonzalo-crisci.webp" alt="Gonzalo Crisci" loading="lazy" draggable="false" /><figcaption><strong>Cr. Gonzalo Crisci</strong><span data-i18n="team.gm">Gerente General</span></figcaption></figure>
+          <figure class="member"><img src="assets/equipo/mauricio-alfonso.webp" alt="Mauricio Alfonso" loading="lazy" draggable="false" /><figcaption><strong>Cr. Mauricio Alfonso</strong><span data-i18n="team.fin">Gerente de Finanzas y Operaciones</span></figcaption></figure>
+          <figure class="member"><img src="assets/equipo/mikaela-lopez.webp" alt="Mikaela López" loading="lazy" draggable="false" /><figcaption><strong>Lic. Mikaela López</strong><span data-i18n="team.vmm">Gerente de Visual &amp; Marketing</span></figcaption></figure>
+          <figure class="member"><img src="assets/equipo/fabian-cairele.webp" alt="Fabián Cairele" loading="lazy" draggable="false" /><figcaption><strong>Fabián Cairele</strong><span data-i18n="team.sales">Ejecutivo de Ventas</span></figcaption></figure>
+          <figure class="member"><img src="assets/equipo/federico-celada.webp" alt="Federico Celada" loading="lazy" draggable="false" /><figcaption><strong>Federico Celada</strong><span data-i18n="team.sales">Ejecutivo de Ventas</span></figcaption></figure>
+          <figure class="member"><img src="assets/equipo/natalia-fiol.webp" alt="Natalia Fiol" loading="lazy" draggable="false" /><figcaption><strong>Natalia Fiol</strong><span data-i18n="team.sales2">Ejecutiva de Ventas</span></figcaption></figure>
+          <figure class="member"><img src="assets/equipo/romina-canete.webp" alt="Romina Cañete" loading="lazy" draggable="false" /><figcaption><strong>Cra. Romina Cañete</strong><span data-i18n="team.adminc">Coordinadora de Administración</span></figcaption></figure>
+          <figure class="member"><img src="assets/equipo/belen-amorin.webp" alt="Belén Amorin" loading="lazy" draggable="false" /><figcaption><strong>Belén Amorin</strong><span data-i18n="team.admina">Auxiliar Administrativa</span></figcaption></figure>
+          <figure class="member"><img src="assets/equipo/emilia-de-leon.webp" alt="Emilia de León" loading="lazy" draggable="false" /><figcaption><strong>Emilia de León</strong><span data-i18n="team.ops">Supervisora de Operaciones</span></figcaption></figure>
+          <figure class="member"><img src="assets/equipo/emiliano-medina.webp" alt="Emiliano Medina" loading="lazy" draggable="false" /><figcaption><strong>Emiliano Medina</strong><span data-i18n="team.mks">Asistente de Marketing y Ventas</span></figcaption></figure>
+          <figure class="member"><img src="assets/equipo/lucas-vasconcellos.webp" alt="Lucas Vasconcellos" loading="lazy" draggable="false" /><figcaption><strong>Lucas Vasconcellos</strong><span data-i18n="team.vm">Visual &amp; Marketing</span></figcaption></figure>
+          <figure class="member"><img src="assets/equipo/victoria-gonzalez.webp" alt="Victoria González" loading="lazy" draggable="false" /><figcaption><strong>Victoria González</strong><span data-i18n="team.vm">Visual &amp; Marketing</span></figcaption></figure>
+          <figure class="member"><img src="assets/equipo/juan-piedrabuena.webp" alt="Juan Piedrabuena" loading="lazy" draggable="false" /><figcaption><strong>Juan Piedrabuena</strong><span data-i18n="team.term">Operario en Terminales</span></figcaption></figure>
+          <figure class="member"><img src="assets/equipo/oscar-de-la-cruz.webp" alt="Oscar de la Cruz" loading="lazy" draggable="false" /><figcaption><strong>Oscar de la Cruz</strong><span data-i18n="team.term">Operario en Terminales</span></figcaption></figure>
+          <figure class="member"><img src="assets/equipo/miguel-piedrabuena.webp" alt="Miguel Piedrabuena" loading="lazy" draggable="false" /><figcaption><strong>Miguel Piedrabuena</strong><span data-i18n="team.term">Operario en Terminales</span></figcaption></figure>
+        </div>
+        <div class="team-progress" aria-hidden="true"><i id="teamBar"></i></div>
+      </div>
     </section>
 
     <!-- VALORES -->
@@ -143,7 +167,7 @@
           <h2 class="cov-title" data-i18n="cov.title">La empresa con mayor cobertura en el país</h2>
           <div class="cov-stats">
             <div class="cov-stat"><strong data-count="30">0</strong><span data-i18n="cov.years">Años de experiencia</span></div>
-            <div class="cov-stat"><strong data-count="50" data-suffix="+">0</strong><span data-i18n="cov.types">Tipos de soportes</span></div>
+            <div class="cov-stat"><strong data-count="100" data-prefix="+">0</strong><span data-i18n="cov.types">Soportes</span></div>
             <div class="cov-stat"><strong id="covCount">0</strong><span data-i18n="cov.deps">Departamentos</span></div>
             <div class="cov-stat"><strong data-count="5">0</strong><span data-i18n="cov.terminals">Terminales de buses</span></div>
           </div>
