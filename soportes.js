@@ -81,6 +81,9 @@ window.SOPORTES = {
     ["Bvar. Batlle y Ordóñez y Av. Rivera", -34.8985, -56.1467],
   ],
 
+  // Buses: departamentos por donde circulan (se pintan al elegir Buses en Productos)
+  buses: ["Montevideo", "Canelones", "San José"],
+
   // Duty Select: circuito de pantallas en los free shops. [aeropuerto, detalle, lat, lng]
   duty: [
     ["Aeropuerto de Carrasco", "Circuito de pantallas en free shop", -34.8384, -56.0308],

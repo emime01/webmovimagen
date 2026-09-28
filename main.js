@@ -448,7 +448,7 @@
   const lerp01 = (p, a, b) => clamp((p - a) / (b - a), 0, 1);
   const clean = (t) => t.replace(/\s*⟲/g, "").trim();
 
-  const DATA = Object.assign({ ruteros: [], shoppings: [], pantallas: [], walls: [], duty: [] }, window.SOPORTES);
+  const DATA = Object.assign({ ruteros: [], shoppings: [], pantallas: [], walls: [], duty: [], buses: [] }, window.SOPORTES);
   const ORDER = ["rutero", "pantalla", "wall", "shopping", "duty"];
   const typeLabel = (t) => T(`type.${t}.label`);
   const typeTag = (t) => T(`type.${t}.tag`);
@@ -499,6 +499,8 @@
   const byDep = {};
   sites.forEach((x) => (byDep[x.dep] ||= []).push(x));
   const supportDeps = depPaths.filter((p) => byDep[p.dataset.name]); // de sur a norte (orden del SVG)
+  // Buses: cobertura por departamento, no son soportes con ubicación
+  const busDeps = depPaths.filter((p) => DATA.buses.includes(p.dataset.name));
   const nDeps = supportDeps.length;
   const ofType = (t) => sites.filter((x) => x.type === t);
   const countOf = (t) => ofType(t).length;
@@ -553,6 +555,7 @@
     pantalla: [typeLabel("pantalla"), byDepText("pantalla", "type.pantalla")],
     wall: [typeLabel("wall"), byDepText("wall", "word.medianera")],
     shopping: [typeLabel("shopping"), `${plural(shopSoportes, "word.soporte")} ${T("in")} ${plural(countOf("shopping"), "type.shopping")}: ${joinList(ofType("shopping").sort((a, b) => b.n - a.n).map((x) => T("cap.shopping.item", { n: x.n, name: siteTitle(x) })))}.`],
+    bus: [typeLabel("bus"), T("cap.bus", { deps: joinList(DATA.buses) })],
     duty: [typeLabel("duty"), T("cap.duty", { airports: T(countOf("duty") === 1 ? "cap.duty.one" : "cap.duty.many", { names: joinList(ofType("duty").map(airportName)) }) })],
   });
   let CAPTIONS = buildCaptions();
@@ -613,6 +616,10 @@
   const camFor = (f) => {
     if (!f) return { ...FULL };
     if (f === "rutero") return fitCam(ofType("rutero").map((x) => x.xy), 60);
+    if (f === "bus") {
+      const pts = busDeps.flatMap((p) => { const b = p.getBBox(); return [[b.x, b.y], [b.x + b.width, b.y + b.height]]; });
+      return pts.length ? fitCam(pts, 60) : { ...FULL };
+    }
     return fitCam(ofType(f).map((x) => x.xy), Math.max(covMap.clientWidth / 55, 9));
   };
   const placeAll = () => {
@@ -723,7 +730,8 @@
   };
   const showDepCard = (path, cx, cy) => {
     const list = byDep[path.dataset.name] || [];
-    const html = `<p class="cc-title">${path.dataset.name}</p><ul class="cc-sum">${summaryHTML(list, filter)}</ul>`;
+    const busLine = busDeps.includes(path) && (!filter || filter === "bus") ? `<li><i class="shape shape-bus"></i><strong>${typeLabel("bus")}</strong>${filter ? `<span>${T("detail.bus")}</span>` : ""}</li>` : "";
+    const html = `<p class="cc-title">${path.dataset.name}</p><ul class="cc-sum">${filter === "bus" ? busLine : busLine + summaryHTML(list, filter)}</ul>`;
     const [x, y] = relToSticky(cx, cy);
     showCardAt(html, x, y, `dep:${path.dataset.name}:${filter}:${LANG}`);
   };
@@ -778,7 +786,7 @@
     covSection.classList.toggle("is-filtered", !!filter);
     covSection.dataset.filter = filter || "";
     covCount.textContent = nDeps;
-    setLit((p) => (byDep[p.dataset.name] || []).some((x) => !filter || x.type === filter));
+    setLit((p) => (filter === "bus" ? busDeps.includes(p) : (byDep[p.dataset.name] || []).some((x) => !filter || x.type === filter)));
     depPaths.forEach((p) => setDash(p, 0, 1));
     showRoutes(filter === "rutero");
     markers.forEach((m) => {

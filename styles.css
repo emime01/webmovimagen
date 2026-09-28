@@ -226,6 +226,7 @@ body.on-white .nav .nav-cta:hover { background: var(--orange); color: var(--whit
 .cov-credit { position: absolute; right: 6px; bottom: 2px; font-size: 9px; font-weight: 500; opacity: 0.6; pointer-events: none; }
 .shape { flex-shrink: 0; background: var(--orange); }
 .shape-rutero { width: 16px; height: 4px; border-radius: 2px; }
+.shape-bus { width: 16px; height: 9px; border-radius: 3px; }
 .shape-shopping { width: 16px; height: 16px; border-radius: 50%; }
 .shape-pantalla { width: 11px; height: 11px; border-radius: 2px; }
 .shape-wall { width: 9px; height: 9px; transform: rotate(45deg); margin: 0 1px; }
