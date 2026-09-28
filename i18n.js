@@ -14,6 +14,8 @@ window.I18N = {
     "nav.proyectos": "Projects",
     "nav.clientes": "Clients",
     "nav.contacto": "Contact",
+    "nav.cta": "Get a quote",
+    "hero.cta": "Get a quote",
 
     "hero.years": "years",
     "hero.left": "Outdoor advertising<br />all over Uruguay.",

@@ -1248,7 +1248,7 @@
   gsap.to(track, {
     x: () => -distance(),
     ease: "none",
-    scrollTrigger: { trigger: "#gallery", start: "center center", end: () => `+=${distance()}`, pin: "#proyectos", scrub: 1, invalidateOnRefresh: true },
+    scrollTrigger: { trigger: "#gallery", start: "center center", end: () => `+=${distance()}`, pin: "#proyectos", scrub: 1, invalidateOnRefresh: true, refreshPriority: 1 },
   });
 
   /* ---------- Contacto ---------- */
