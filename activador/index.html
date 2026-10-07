@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Movimagen | Activador</title>
+  <meta name="robots" content="noindex" />
+  <meta name="theme-color" content="#eb691c" />
+  <link rel="icon" href="../assets/logo-color.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="estilos.css" />
+</head>
+<body>
+  <!-- Lo que ve el público -->
+  <main id="escenario" aria-live="polite"></main>
+
+  <!-- Panel de control: tecla D (o ?panel en la dirección) -->
+  <aside id="panel" aria-label="Panel de control">
+    <header>
+      <strong>Activador</strong>
+      <button type="button" class="cerrar" aria-label="Cerrar panel">×</button>
+    </header>
+    <canvas width="320" height="240"></canvas>
+    <p class="aviso">La cámara se analiza en este equipo. No se graba ni se envía ninguna imagen.</p>
+    <h2>Señales</h2>
+    <dl class="senales"></dl>
+    <h2>Reglas</h2>
+    <ul class="reglas"></ul>
+    <h2>Últimos cambios</h2>
+    <pre class="registro"></pre>
+    <h2>Disparos de hoy</h2>
+    <dl class="conteo"></dl>
+    <div class="acciones">
+      <button type="button" class="csv">Descargar CSV</button>
+      <button type="button" class="borrar">Borrar conteo</button>
+    </div>
+    <p class="ayuda">D panel · F pantalla completa · 1–4 botones de prueba · doble clic pantalla completa</p>
+  </aside>
+
+  <script type="module" src="motor.js"></script>
+</body>
+</html>

@@ -1,0 +1,72 @@
+:root {
+  --orange: #eb691c;
+  --white: #ffffff;
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --font: "Montserrat", "Helvetica Neue", Arial, sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body { background: #000; color: var(--white); font-family: var(--font); overflow: hidden; -webkit-font-smoothing: antialiased; }
+body.sin-puntero, body.sin-puntero * { cursor: none; }
+
+/* ---------- Escenario ---------- */
+#escenario { position: fixed; inset: 0; overflow: hidden; background: var(--orange); }
+.capa { position: absolute; inset: 0; opacity: 0; transform: scale(1.03); transition: opacity 0.6s var(--ease), transform 1.2s var(--ease); }
+.capa.visible { opacity: 1; transform: none; }
+.capa > img, .capa > video { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+.escena-mensaje { background: var(--fondo); display: grid; place-items: center; }
+.escena-mensaje .fondo-foto { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.escena-mensaje .fondo-foto + .mensaje { background: linear-gradient(0deg, rgba(235, 105, 28, 0.92) 0%, rgba(235, 105, 28, 0.55) 60%, rgba(235, 105, 28, 0) 100%); }
+.mensaje {
+  position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: flex-end;
+  padding: 7vmin; gap: 2.4vmin;
+}
+.mensaje .logo { position: absolute; top: 6vmin; left: 7vmin; width: clamp(110px, 18vmin, 260px); }
+.mensaje h1 { font-size: clamp(36px, 11vmin, 180px); font-weight: 700; line-height: 0.95; letter-spacing: -0.03em; max-width: 14ch; }
+.mensaje p { font-size: clamp(16px, 3.6vmin, 56px); font-weight: 500; line-height: 1.2; max-width: 28ch; opacity: 0.9; }
+.capa.visible .mensaje h1, .capa.visible .mensaje p { animation: subir 0.9s var(--ease) both; }
+.capa.visible .mensaje p { animation-delay: 0.12s; }
+@keyframes subir { from { opacity: 0; transform: translateY(4vmin); } }
+
+/* Mensaje sobre fondo blanco: letras naranjas y logo a color */
+.escena-mensaje.claro { color: var(--orange); }
+.escena-mensaje.claro .logo { content: url("../assets/logo-color.png"); }
+
+/* Pantallas verticales (tótems) */
+@media (orientation: portrait) {
+  .mensaje h1 { font-size: clamp(36px, 14vw, 200px); }
+  .mensaje p { font-size: clamp(16px, 5vw, 64px); }
+}
+
+/* ---------- Panel ---------- */
+#panel {
+  position: fixed; top: 0; right: 0; bottom: 0; z-index: 10; width: min(360px, 100vw);
+  background: rgba(17, 17, 17, 0.94); color: #eee; font-size: 12px; line-height: 1.4;
+  padding: 16px 20px 24px; overflow-y: auto;
+  transform: translateX(100%); transition: transform 0.4s var(--ease);
+}
+body.con-panel #panel { transform: none; }
+body.con-panel.sin-puntero, body.con-panel.sin-puntero * { cursor: auto; }
+#panel header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; font-size: 14px; color: var(--orange); }
+#panel canvas { width: 100%; height: auto; display: block; border-radius: 4px; background: #111; }
+#panel h2 { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--orange); margin: 18px 0 6px; }
+#panel dl { display: grid; grid-template-columns: auto 1fr; gap: 3px 12px; }
+#panel dt { color: #999; }
+#panel dd { text-align: right; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+#panel ul { list-style: none; display: grid; gap: 3px; }
+#panel li { display: flex; justify-content: space-between; gap: 12px; }
+#panel li em { font-style: normal; color: #999; }
+#panel li.on { color: var(--orange); font-weight: 600; }
+#panel li.on em { color: var(--orange); }
+#panel li.off { color: #555; }
+#panel li.off em { color: #555; }
+#panel pre { font-family: ui-monospace, Menlo, monospace; font-size: 11px; white-space: pre-wrap; color: #bbb; min-height: 1.4em; }
+#panel button { font: inherit; color: inherit; cursor: pointer; }
+#panel .cerrar { background: none; border: 0; font-size: 22px; line-height: 1; color: #999; }
+#panel .acciones { display: flex; gap: 8px; margin-top: 12px; }
+#panel .acciones button { flex: 1; padding: 8px; border-radius: 4px; border: 1px solid #444; background: #222; }
+#panel .acciones button:hover { border-color: var(--orange); }
+#panel .aviso { margin-top: 8px; color: #999; font-size: 11px; }
+#panel .ayuda { margin-top: 16px; color: #777; font-size: 11px; }
