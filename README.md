@@ -46,6 +46,9 @@ Límites de departamentos de geoBoundaries y trazado de rutas de OpenStreetMap (
 ## Portada
 La ilustración original está en `tools/portada-original.webp`. `tools/generar-portada.mjs` la convierte en `assets/portada/ciudad.webp` (las líneas y el orden en que se dibujan) y en la silueta que tapa el 30 (el `<path>` de `.hero-sil` en `index.html`). Si se cambia la ilustración, hay que volver a correrlo.
 
+## Activador
+En `activador/` hay un reproductor para pantallas que cambia el contenido según lo que ve una cámara (personas, cercanía, gestos, tránsito) y según otros disparadores (horario, clima, sonido, botones, toque). Se abre en `/activador/`; no está enlazado desde la landing. Uso, configuración, privacidad y la evaluación de otros disparadores en `activador/README.md`.
+
 ## Pendiente
 - Administrador de contenidos (en pausa): los textos ya están organizados por clave en `i18n.js` y `data-i18n`, así que se puede conectar a una base de datos cuando se retome
 - Fotos de mayor resolución para los proyectos (las actuales son de 400 px)

@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Movimagen | Panel del Activador</title>
+  <meta name="robots" content="noindex" />
+  <meta name="theme-color" content="#eb691c" />
+  <link rel="icon" href="../assets/logo-color.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="panel.css" />
+</head>
+<body>
+  <!-- Entrar -->
+  <section id="acceso" class="acceso" hidden>
+    <form class="tarjeta acceso-caja" id="formAcceso">
+      <img src="../assets/logo-color.png" alt="Movimagen" class="acceso-logo" />
+      <h1>Panel del Activador</h1>
+      <label>Mail <input type="email" name="email" required autocomplete="username" /></label>
+      <label>Contraseña <input type="password" name="clave" required minlength="6" autocomplete="current-password" /></label>
+      <button type="submit" class="boton primario">Entrar</button>
+      <div class="acceso-otros">
+        <button type="button" class="enlace" id="crearCuenta">Crear cuenta</button>
+        <button type="button" class="enlace" id="olvide">Olvidé mi contraseña</button>
+      </div>
+      <p class="aviso" id="avisoAcceso" role="status"></p>
+    </form>
+  </section>
+
+  <!-- Panel -->
+  <div id="app" hidden>
+    <header class="cabecera">
+      <img src="../assets/logo-color.png" alt="Movimagen" class="cabecera-logo" />
+      <nav class="pestanas" role="tablist">
+        <button role="tab" data-pestana="pantallas" aria-selected="true">Pantallas</button>
+        <button role="tab" data-pestana="contenidos">Contenidos</button>
+        <button role="tab" data-pestana="reglas">Reglas</button>
+        <button role="tab" data-pestana="estadisticas">Estadísticas</button>
+        <button role="tab" data-pestana="equipo">Equipo</button>
+      </nav>
+      <div class="usuario"><span id="miMail"></span> <button class="enlace" id="salir">Salir</button></div>
+    </header>
+
+    <main class="contenido">
+      <section data-seccion="pantallas">
+        <div class="titulo-seccion">
+          <div>
+            <h2>Pantallas</h2>
+            <p class="ayuda">Cada pantalla abre su propio enlace. Lo que cambies acá se actualiza solo en la pantalla.</p>
+          </div>
+          <button class="boton primario" id="nuevaPantalla">+ Nueva pantalla</button>
+        </div>
+        <div id="listaPantallas" class="lista-pantallas"></div>
+      </section>
+
+      <section data-seccion="contenidos" hidden>
+        <div class="titulo-seccion">
+          <div>
+            <h2>Contenidos</h2>
+            <p class="ayuda">Fotos, videos y mensajes con la marca. Arrastrá archivos acá para subirlos.</p>
+          </div>
+          <div class="acciones">
+            <label class="boton">Subir fotos o videos<input type="file" id="subir" accept="image/*,video/*" multiple hidden /></label>
+            <button class="boton primario" id="nuevoMensaje">+ Nuevo mensaje</button>
+          </div>
+        </div>
+        <p class="aviso" id="avisoSubida" role="status"></p>
+        <div id="listaEscenas" class="grilla-escenas"></div>
+      </section>
+
+      <section data-seccion="reglas" hidden>
+        <div class="titulo-seccion">
+          <div>
+            <h2>Reglas</h2>
+            <p class="ayuda">Qué se muestra y cuándo. Si se cumplen varias, gana la de mayor prioridad.</p>
+          </div>
+          <button class="boton primario" id="nuevaRegla">+ Nueva regla</button>
+        </div>
+        <h3>Interrumpen y muestran algo en el momento</h3>
+        <div id="reglasEventos" class="lista-reglas"></div>
+        <h3>Cambian la rotación mientras se cumplen</h3>
+        <div id="reglasContextos" class="lista-reglas"></div>
+      </section>
+
+      <section data-seccion="estadisticas" hidden>
+        <div class="titulo-seccion">
+          <div>
+            <h2>Estadísticas</h2>
+            <p class="ayuda">Cuántas veces se disparó cada regla. Solo se cuentan disparos: no se guarda ninguna imagen.</p>
+          </div>
+        </div>
+        <div class="filtros">
+          <label>Período
+            <select id="filtroDias">
+              <option value="7">Últimos 7 días</option>
+              <option value="30" selected>Últimos 30 días</option>
+              <option value="90">Últimos 90 días</option>
+            </select>
+          </label>
+          <label>Pantalla <select id="filtroPantalla"></select></label>
+          <button class="boton" id="descargarCsv">Descargar CSV</button>
+        </div>
+        <div id="estadisticas"></div>
+      </section>
+
+      <section data-seccion="equipo" hidden>
+        <div class="titulo-seccion">
+          <div>
+            <h2>Equipo</h2>
+            <p class="ayuda">Mails que pueden entrar al panel. Cada persona crea su cuenta con "Crear cuenta" usando este mail.</p>
+          </div>
+        </div>
+        <form id="formEquipo" class="fila-form">
+          <input type="email" name="email" placeholder="nombre@movimagen.com.uy" required />
+          <button class="boton primario">Agregar</button>
+        </form>
+        <ul id="listaEquipo" class="lista-equipo"></ul>
+      </section>
+    </main>
+  </div>
+
+  <div id="sinPermiso" class="acceso" hidden>
+    <div class="tarjeta acceso-caja">
+      <h1>Sin acceso</h1>
+      <p>Tu usuario (<strong id="mailSinPermiso"></strong>) todavía no puede entrar al panel. Pedile a alguien del equipo que agregue tu mail en la sección Equipo.</p>
+      <button class="boton" id="salirSinPermiso">Salir</button>
+    </div>
+  </div>
+
+  <dialog id="dialogo" class="dialogo"><form method="dialog" id="formDialogo"></form></dialog>
+  <div id="tooltip" class="tooltip" role="tooltip" hidden></div>
+  <div id="nota" class="nota" role="status" hidden></div>
+
+  <script type="module" src="panel.js"></script>
+</body>
+</html>
