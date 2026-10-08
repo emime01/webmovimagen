@@ -140,9 +140,9 @@ En Contenidos, **+ Cuestionario inmobiliario** crea una experiencia editable: in
 
 Los cuatro destinos vienen configurados con enlaces del buscador público de Veocasas, comprobados el 8 de octubre de 2026: Mercedes, Montevideo, Colonia del Sacramento y Paysandú. Podés editar los enlaces para una campaña específica. Los filtros existentes se conservan y se añaden parámetros UTM para identificar ciudad y pantalla. El panel exige completar los cuatro antes de guardar.
 
-- Gestos: 👍 sí / Mercedes; 👎 no / Montevideo; ✌️ Colonia; 🖐️ Paysandú. Hay que sostener el gesto (0,8 s por defecto) y soltarlo antes de contestar la siguiente pregunta.
+- Gestos: 🖐️ sí; ✌️ por ahora no. Destinos: ☝️ Mercedes; ✌️ Montevideo; 👍 Colonia; 🖐️ Paysandú. Hay que sostener el gesto (0,8 s por defecto) y soltarlo antes de contestar la siguiente pregunta.
 - Toque y teclas 1–4 también permiten responder. Escape cancela. Las reglas normales no interrumpen una sesión; «Mostrar ahora» del administrador sí puede hacerlo.
-- Al acercarse (45 % del alto del cuadro), empieza la primera pregunta. También se puede comenzar con 👍, toque o tecla 1.
+- Al acercarse (45 % del alto del cuadro), empieza la primera pregunta. También se puede comenzar con 🖐️, toque o tecla 1.
 - Sin respuesta durante 25 s, vuelve a la tanda. Si el detector cargó y no ve personas durante 8 s en una pregunta, cancela. El resultado permanece 20 s. Los tiempos se editan en el panel.
 - Las respuestas y los QR **mostrados** se cuentan en el equipo y, para pantallas conectadas, mediante las estadísticas existentes de Supabase, con prefijo «Cuestionario». No se guardan imágenes ni identidad del visitante. Medir **escaneos reales** requiere que Veocasas registre las visitas con esos parámetros; mostrar un QR no prueba que se haya escaneado.
 - Se guarda la configuración en un mensaje con un encabezado reservado en `texto`; no requiere nuevas tablas. No editar ese mensaje desde versiones anteriores del panel.
@@ -154,8 +154,13 @@ node --test activador/tests/cuestionario.test.mjs
 # Con el servidor Python activo en 8000 y Playwright instalado:
 node activador/tests/cuestionario-browser.cjs
 node activador/tests/cuestionario-panel.cjs
+node activador/tests/presentacion-veocasas.cjs
 # Opcional: descarga modelos reales y usa cámara sintética (necesita red):
 node activador/tests/cuestionario-camara.cjs
 ```
 
 Las pruebas de navegador validan el flujo y los enlaces del reproductor, y usan señales de cámara y backend del panel simulados. Los filtros de Veocasas se comprobaron por separado con solicitudes HTTPS y los filtros reconocidos por el servidor; Además, se comprobó la carga de ambos modelos reales de MediaPipe con la cámara sintética de Chromium. No se probó una cámara física ni el guardado en Supabase real. La biblioteca local QR es qrcode-generator 1.4.4 (MIT, ver `vendor/qrcode-LICENSE.txt`); no descarga un generador externo durante la sesión.
+
+### Muestra vertical para Veocasas
+
+La ruta `/activador/?cuestionario=inmobiliario` presenta las placas aprobadas en un lienzo 9:16 que se adapta a la pantalla sin cortar el diseño. En monitores horizontales se centra con márgenes oscuros. La muestra vuelve a la invitación al terminar, sin intercalar campañas de Movimagen. Con `&camara=0` se puede presentar por toque o teclas 1–4. Las placas de invitación y preguntas tienen textos fijos de la presentación; el contenido editable creado desde el panel conserva su vista dinámica. El resultado muestra la ciudad elegida y reemplaza completamente el QR ilustrativo por un QR real al filtro correspondiente. Gestos de inicio/sí: mano abierta; por ahora no: dos dedos. Ciudades: índice hacia arriba, dos dedos, pulgar arriba y mano abierta.

@@ -5,14 +5,14 @@ const {chromium}=require('playwright');
  const page=await browser.newPage();const errors=[];page.on('pageerror',e=>errors.push(e.message));
  await page.goto('http://127.0.0.1:8000/activador/?camara=0&cuestionario=inmobiliario',{waitUntil:'domcontentloaded'});
  await page.locator('.quiz-opcion').first().waitFor();
- await page.keyboard.press('1');assert.equal(await page.locator('.escena-cuestionario h1').innerText(),'¿Estás buscando mudarte?');
- await page.keyboard.press('1');assert.equal(await page.locator('.escena-cuestionario h1').innerText(),'¿A dónde te gustaría mudarte?');
+ await page.keyboard.press('1');assert.equal(await page.locator('.escena-cuestionario h1').innerText(),'¿Estás pensando en mudarte?');
+ await page.keyboard.press('1');assert.equal(await page.locator('.escena-cuestionario h1').innerText(),'¿Dónde te gustaría vivir?');
  await page.keyboard.press('4');assert.match(await page.locator('.escena-cuestionario h1').innerText(),/Paysandú/);
  assert.equal(await page.locator('.quiz-qr').count(),1);
  const destinoReal = new URL(await page.locator('.quiz-qr').getAttribute('href'));
  assert.equal(destinoReal.hostname,'veocasas.com'); assert.equal(destinoReal.searchParams.get('location'),'11');
  assert.equal(destinoReal.searchParams.get('neighborhoods'),'ec42c906-78ff-4915-96c6-0b208e90b059');
- await page.keyboard.press('Escape');await page.waitForTimeout(800);assert.equal(await page.locator('.escena-cuestionario').count(),0);
+ await page.keyboard.press('Escape');await page.waitForTimeout(800);assert.equal(await page.locator('.quiz-invitacion').count(),1);
  await page.goto('http://127.0.0.1:8000/activador/?camara=0',{waitUntil:'domcontentloaded'});
  await page.evaluate(async()=>{
   const {crearCuestionario,inmobiliario}=await import('./cuestionario.js');
@@ -24,12 +24,12 @@ const {chromium}=require('playwright');
  });
  // Gesture release, sustained start, then prevent same held gesture answering next question.
  const state=await page.evaluate(()=>{
-  let t=performance.now();quiz.paso(t);quiz.paso(t+400);signals.gesto='Thumb_Up';quiz.paso(t+500);quiz.paso(t+1400);
+  let t=performance.now();quiz.paso(t);quiz.paso(t+400);signals.gesto='Open_Palm';quiz.paso(t+500);quiz.paso(t+1400);
   const first=root.querySelector('h1').textContent;quiz.paso(t+1500);quiz.paso(t+2500);const held=root.querySelector('h1').textContent;
-  signals.gesto=null;quiz.paso(t+2600);quiz.paso(t+3000);signals.gesto='Thumb_Up';quiz.paso(t+3100);quiz.paso(t+4000);
+  signals.gesto=null;quiz.paso(t+2600);quiz.paso(t+3000);signals.gesto='Open_Palm';quiz.paso(t+3100);quiz.paso(t+4000);
   return {first,held,next:root.querySelector('h1').textContent};
- });assert.equal(state.first,state.held);assert.match(state.next,/dónde/);
- await page.evaluate(()=>{signals.gesto=null;let t=performance.now();quiz.paso(t+4100);quiz.paso(t+4500);signals.gesto='Victory';quiz.paso(t+4600);quiz.paso(t+5500);});
+ });assert.equal(state.first,state.held);assert.match(state.next,/Dónde/);
+ await page.evaluate(()=>{signals.gesto=null;let t=performance.now();quiz.paso(t+4100);quiz.paso(t+4500);signals.gesto='Thumb_Up';quiz.paso(t+4600);quiz.paso(t+5500);});
  const link=await page.locator('.quiz-qr').getAttribute('href');assert.equal(new URL(link).searchParams.get('filtro'),'Colonia');assert.equal(new URL(link).searchParams.get('utm_content'),'mercedes-01');assert.equal(await page.locator('.quiz-qr svg').count(),1);
  await page.screenshot({path:'/tmp/cuestionario-resultado.png'});
  // Timeout and negative branch.

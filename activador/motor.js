@@ -21,8 +21,11 @@ if (params.get('pantalla')) {
 }
 const config = nube ? { ...configLocal, ...nube.config } : configLocal;
 if (params.get('cuestionario') === 'inmobiliario' && !nube) {
-  config.escenas = { ...config.escenas, inmobiliario: { tipo: 'mensaje', titulo: 'Tu próximo hogar', texto: MARCA + JSON.stringify(inmobiliario()), duracion: 18 } };
-  config.tanda = ['inmobiliario', ...config.tanda];
+  document.title = 'Veocasas · Tu próximo hogar';
+  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', '#e32219');
+  config.escenas = { ...config.escenas, inmobiliario: { tipo: 'mensaje', titulo: 'Tu próximo hogar', texto: MARCA + JSON.stringify({ ...inmobiliario(), presentacion: 'veocasas' }), duracion: 18 } };
+  config.tanda = ['inmobiliario'];
+  config.ubicacion = { nombre: 'Mercedes', lat: -33.2524, lon: -58.0305 };
 }
 const panel = document.getElementById('panel');
 const s = crearSenales();

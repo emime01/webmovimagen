@@ -87,3 +87,32 @@ body.con-panel.sin-puntero, body.con-panel.sin-puntero * { cursor: auto; }
 .quiz-qr { display: block; background: white; width: min(34vmin, 330px); min-width: 180px; border-radius: 8px; }
 .quiz-qr svg { display: block; width: 100%; height: auto; }
 @media (orientation: portrait) { .quiz-opcion { flex-basis: 40%; } }
+
+/* Muestra Veocasas: lienzo vertical completo, sin recortes en monitor horizontal. */
+.quiz-presentacion { padding: 0; background: #181818; overflow: hidden; gap: 0; }
+.quiz-placa { position: relative; width: min(100vw, 56.25vh); height: min(100vh, 177.7778vw); flex: none; background: #f7f3ee; color: #202020; container-type: inline-size; }
+.quiz-arte { display: block; position: absolute; inset: 0; width: 100%; height: 100%; object-fit: fill; pointer-events: none; }
+.quiz-accessible { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
+.quiz-presentacion .quiz-opciones { position: absolute; inset: 0; display: block; }
+.quiz-presentacion .quiz-hit { position: absolute; display: block; max-width: none; min-width: 0; margin: 0; padding: 0; background: transparent; border: 0; border-radius: 3cqw; }
+.quiz-hit:hover { box-shadow: inset 0 0 0 0.5cqw rgba(227,34,25,.6); }
+.quiz-hit:focus-visible { outline: 0.6cqw solid #202020; outline-offset: -0.6cqw; }
+.quiz-invitacion .quiz-hit { left: 3.5%; top: 80%; width: 93%; height: 13%; }
+.quiz-mudanza .quiz-hit:nth-child(1) { left: 3%; top: 59%; width: 94%; height: 18%; }
+.quiz-mudanza .quiz-hit:nth-child(2) { left: 3%; top: 77.8%; width: 94%; height: 17%; }
+.quiz-destino .quiz-hit:nth-child(1) { left: 4%; top: 32%; width: 45%; height: 29%; }
+.quiz-destino .quiz-hit:nth-child(2) { left: 51%; top: 32%; width: 45%; height: 29%; }
+.quiz-destino .quiz-hit:nth-child(3) { left: 4%; top: 62%; width: 45%; height: 29%; }
+.quiz-destino .quiz-hit:nth-child(4) { left: 51%; top: 62%; width: 45%; height: 29%; }
+.quiz-presentacion .quiz-progreso { position: absolute; bottom: .8%; left: 15%; width: 70%; height: .4%; accent-color: #e32219; }
+.quiz-presentacion .quiz-progreso[hidden] { display: none; }
+.quiz-resultado-titulo { position: absolute; top: 9.5%; left: 0; width: 100%; height: 23.5%; padding: 1.5% 5%; background: #f7f3ee; display: flex; flex-direction: column; justify-content: center; gap: 1cqw; }
+.quiz-presentacion .quiz-resultado-titulo h1 { font-size: 9cqw; line-height: 1.04; letter-spacing: -.04em; max-width: none; font-weight: 800; }
+.quiz-resultado-titulo p { font-size: 3.8cqw; }
+.quiz-resultado-qr { position: absolute; top: 74%; left: 12%; width: 76%; height: 18%; border-radius: 4cqw; padding: 3cqw; background: #fff; display: flex; align-items: center; gap: 3cqw; }
+.quiz-resultado-qr .quiz-qr { position: relative; z-index: 1; width: 42%; min-width: 0; flex: none; border-radius: 0; }
+.quiz-resultado-detalles { flex: 1; min-width: 0; }
+.quiz-resultado-detalles strong { display: block; font-size: 5cqw; line-height: 1.08; color: #e32219; }
+.quiz-resultado-detalles p { margin-top: 1.5cqw; font-size: 2.3cqw; }
+.quiz-marca { position: absolute; width: 65%; height: auto; top: 5%; left: 17.5%; }
+.quiz-resultado:not(:has(.quiz-arte)) .quiz-resultado-titulo { top: 30%; height: 35%; text-align: center; }

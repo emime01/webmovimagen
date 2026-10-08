@@ -845,7 +845,7 @@ function editarCuestionario(escena) {
     campo('Tiempo por pregunta (segundos)', c, 'espera', { type: 'number', min: 3, max: 120 }),
     campo('Tiempo del resultado (segundos)', c, 'resultado', { type: 'number', min: 3, max: 120 }),
     campo('Sostener gesto (segundos)', c, 'sostener', { type: 'number', min: 0.3, max: 3, step: 0.1 }),
-    el('p', { class: 'ayuda' }, 'Sí 👍 / No 👎. Destinos: 👍, 👎, ✌️, 🖐️. Se debe soltar el gesto antes de responder la siguiente pregunta. También funciona con toque o teclas 1–4.'),
+    el('p', { class: 'ayuda' }, 'Sí 🖐️ / Por ahora no ✌️. Destinos: Mercedes ☝️, Montevideo ✌️, Colonia 👍, Paysandú 🖐️. Se debe soltar el gesto antes de responder la siguiente pregunta. También funciona con toque o teclas 1–4.'),
   ];
   c.ciudades.forEach((d, i) => cuerpo.push(el('h3', {}, 'Destino ' + (i + 1)),
     campo('Ciudad', d, 'nombre'), campo('Título del resultado', d, 'titulo'), campo('Texto del resultado', d, 'texto'),
