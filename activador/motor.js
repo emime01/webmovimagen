@@ -1,5 +1,6 @@
 // Activador · motor de reglas, reproductor y panel de control
 import configLocal from './config.js';
+import { crearCuestionario, leerCuestionario, inmobiliario, MARCA } from './cuestionario.js';
 import { crearSenales, iniciarCamara, iniciarClima, iniciarSonido, iniciarEntradas } from './disparadores.js';
 import { conectarPantalla } from './nube.js';
 
@@ -19,6 +20,10 @@ if (params.get('pantalla')) {
   }
 }
 const config = nube ? { ...configLocal, ...nube.config } : configLocal;
+if (params.get('cuestionario') === 'inmobiliario' && !nube) {
+  config.escenas = { ...config.escenas, inmobiliario: { tipo: 'mensaje', titulo: 'Tu próximo hogar', texto: MARCA + JSON.stringify(inmobiliario()), duracion: 18 } };
+  config.tanda = ['inmobiliario', ...config.tanda];
+}
 const panel = document.getElementById('panel');
 const s = crearSenales();
 
@@ -113,11 +118,18 @@ const plantilla = (t) => String(t ?? '').replace(/\{(\w+)\}/g, (_, k) => {
   return valores[k] ?? '{' + k + '}';
 });
 
+const cuestionario = crearCuestionario({ raiz: escenario, senales: s, pantalla: params.get('pantalla'),
+  registrar: nombre => { contar(nombre); nube?.disparo(nombre); anotar(nombre); },
+  terminar: () => { if (evento) cerrar(performance.now()); siguienteDeTanda(); },
+});
 let escenaActual = null;
 let finEscena = Infinity;
 const mostrar = (id) => {
   const e = config.escenas[id];
   if (!e) return;
+  cuestionario.cancelar();
+  const preguntas = leerCuestionario(e);
+  if (preguntas) { escenaActual = id; finEscena = Infinity; cuestionario.abrir(preguntas); return; }
   const capa = document.createElement('div');
   capa.className = 'capa escena-' + e.tipo;
   if (e.tipo === 'imagen') {
@@ -148,7 +160,7 @@ const mostrar = (id) => {
 };
 const pintarTextos = (capa) => {
   const h1 = capa.querySelector('h1'), p = capa.querySelector('p');
-  if (!h1) return;
+  if (!h1 || capa.classList.contains('escena-cuestionario')) return;
   const t = plantilla(capa.dataset.titulo), x = plantilla(capa.dataset.texto);
   if (h1.textContent !== t) h1.textContent = t;
   if (p.textContent !== x) p.textContent = x;
@@ -190,6 +202,7 @@ const cerrar = (ahora) => {
 const paso = () => {
   const ahora = performance.now();
   s.fecha = reloj();
+  if (cuestionario.paso(ahora)) return;
   for (const r of activas) {
     const cumple = evaluar(r, ahora);
     if (!cumple) r.desde = null;
@@ -321,8 +334,9 @@ addEventListener('pointermove', () => {
 for (const e of Object.values(config.escenas)) for (const src of [e.src, e.imagen]) if (src && e.tipo !== 'video') new Image().src = src;
 
 iniciarEntradas(s, escenario);
-const usaObjetos = usa('personas', 'cerca', 'vehiculos');
-const usaGestos = usa('gesto');
+const hayCuestionarios = Object.values(config.escenas).some(leerCuestionario);
+const usaObjetos = hayCuestionarios || usa('personas', 'cerca', 'vehiculos');
+const usaGestos = hayCuestionarios || usa('gesto');
 if (params.get('camara') !== '0' && (usaObjetos || usaGestos || usa('movimiento'))) {
   iniciarCamara(s, config.camara, { objetos: usaObjetos, gestos: usaGestos });
 }

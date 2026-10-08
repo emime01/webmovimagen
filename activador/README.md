@@ -133,3 +133,29 @@ Qué más puede cambiar el contenido, cuánto cuesta y qué tan bien funciona en
 1. **Piloto con cámara en un tótem o pantalla de shopping**: es donde la gente pasa cerca y a pie, y la cámara está protegida. Personas + cercanía + saludo con la mano, con un aviso que invite a saludar.
 2. **Contexto en toda la red** (horario y clima): no necesita hardware nuevo y sirve para vender campañas "contextuales" a bebidas, delivery, farmacias y seguros.
 3. **Siguiente paso**: QR → celular → pantalla y control remoto con un servidor en tiempo real, y medición de audiencia como dato propio para los reportes a clientes.
+
+## Cuestionario inmobiliario por cámara
+
+En Contenidos, **+ Cuestionario inmobiliario** crea una experiencia editable: invitación a acercarse → «¿Estás buscando mudarte?» → Mercedes, Montevideo, Colonia o Paysandú → resultado de esa ciudad con QR. Si responde no, muestra una despedida. Agregá el contenido a la rotación de la pantalla de Mercedes o a una regla de cercanía.
+
+Los cuatro destinos vienen configurados con enlaces del buscador público de Veocasas, comprobados el 8 de octubre de 2026: Mercedes, Montevideo, Colonia del Sacramento y Paysandú. Podés editar los enlaces para una campaña específica. Los filtros existentes se conservan y se añaden parámetros UTM para identificar ciudad y pantalla. El panel exige completar los cuatro antes de guardar.
+
+- Gestos: 👍 sí / Mercedes; 👎 no / Montevideo; ✌️ Colonia; 🖐️ Paysandú. Hay que sostener el gesto (0,8 s por defecto) y soltarlo antes de contestar la siguiente pregunta.
+- Toque y teclas 1–4 también permiten responder. Escape cancela. Las reglas normales no interrumpen una sesión; «Mostrar ahora» del administrador sí puede hacerlo.
+- Al acercarse (45 % del alto del cuadro), empieza la primera pregunta. También se puede comenzar con 👍, toque o tecla 1.
+- Sin respuesta durante 25 s, vuelve a la tanda. Si el detector cargó y no ve personas durante 8 s en una pregunta, cancela. El resultado permanece 20 s. Los tiempos se editan en el panel.
+- Las respuestas y los QR **mostrados** se cuentan en el equipo y, para pantallas conectadas, mediante las estadísticas existentes de Supabase, con prefijo «Cuestionario». No se guardan imágenes ni identidad del visitante. Medir **escaneos reales** requiere que Veocasas registre las visitas con esos parámetros; mostrar un QR no prueba que se haya escaneado.
+- Se guarda la configuración en un mensaje con un encabezado reservado en `texto`; no requiere nuevas tablas. No editar ese mensaje desde versiones anteriores del panel.
+
+Para probar el flujo local sin cámara, abrir la ruta `/activador/?cuestionario=inmobiliario&camara=0`. La demostración incluye los cuatro filtros de Veocasas. Si se borra un enlace, muestra un aviso en lugar de un QR. Para verificarlo:
+
+```bash
+node --test activador/tests/cuestionario.test.mjs
+# Con el servidor Python activo en 8000 y Playwright instalado:
+node activador/tests/cuestionario-browser.cjs
+node activador/tests/cuestionario-panel.cjs
+# Opcional: descarga modelos reales y usa cámara sintética (necesita red):
+node activador/tests/cuestionario-camara.cjs
+```
+
+Las pruebas de navegador validan el flujo y los enlaces del reproductor, y usan señales de cámara y backend del panel simulados. Los filtros de Veocasas se comprobaron por separado con solicitudes HTTPS y los filtros reconocidos por el servidor; Además, se comprobó la carga de ambos modelos reales de MediaPipe con la cámara sintética de Chromium. No se probó una cámara física ni el guardado en Supabase real. La biblioteca local QR es qrcode-generator 1.4.4 (MIT, ver `vendor/qrcode-LICENSE.txt`); no descarga un generador externo durante la sesión.

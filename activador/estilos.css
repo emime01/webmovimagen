@@ -70,3 +70,20 @@ body.con-panel.sin-puntero, body.con-panel.sin-puntero * { cursor: auto; }
 #panel .acciones button:hover { border-color: var(--orange); }
 #panel .aviso { margin-top: 8px; color: #999; font-size: 11px; }
 #panel .ayuda { margin-top: 16px; color: #777; font-size: 11px; }
+
+/* Cuestionario por gestos, toque o teclado */
+.escena-cuestionario { background: #eb691c; padding: 4vmin 6vmin; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2vmin; text-align: center; overflow-y: auto; }
+.escena-cuestionario > .quiz-logo { height: auto; object-fit: contain; width: clamp(100px, 15vmin, 200px); margin-bottom: 1vmin; }
+.quiz-paso { font-size: clamp(12px, 2vmin, 24px); text-transform: uppercase; letter-spacing: .1em; }
+.escena-cuestionario h1 { font-size: clamp(28px, 7vmin, 100px); line-height: 1.05; max-width: 20ch; }
+.quiz-texto { font-size: clamp(16px, 3vmin, 36px); max-width: 45ch; }
+.quiz-opciones { display: flex; flex-wrap: wrap; justify-content: center; gap: 2vmin; width: 100%; }
+.quiz-opcion { flex: 1 1 150px; max-width: 300px; padding: 2vmin; border: 2px solid white; border-radius: 16px; background: white; color: #8d3600; font: inherit; cursor: pointer; display: grid; gap: 1vmin; }
+.quiz-opcion strong { font-size: clamp(18px, 3vmin, 38px); }
+.quiz-gesto { font-size: clamp(32px, 7vmin, 80px); }
+.quiz-opcion:focus-visible { outline: 4px solid #111; outline-offset: 4px; }
+.quiz-progreso { width: min(400px, 80vw); height: 12px; accent-color: white; }
+.quiz-ayuda { font-size: clamp(12px, 2vmin, 24px); max-width: 50ch; }
+.quiz-qr { display: block; background: white; width: min(34vmin, 330px); min-width: 180px; border-radius: 8px; }
+.quiz-qr svg { display: block; width: 100%; height: auto; }
+@media (orientation: portrait) { .quiz-opcion { flex-basis: 40%; } }

@@ -1,5 +1,6 @@
 // Activador · panel de administración (Supabase, proyecto sunsignal)
 import { crearCliente, canalDe } from './nube.js';
+import { inmobiliario, leerCuestionario, validarCuestionario, MARCA } from './cuestionario.js';
 
 const sb = await crearCliente();
 const BUCKET = 'activador';
@@ -228,7 +229,7 @@ function miniatura(e) {
     if (e.fondo && !claro) m.style.background = e.fondo;
     if (e.imagen) m.append(el('img', { src: e.imagen, alt: '', loading: 'lazy' }));
     m.append(
-      el('div', { class: 'mini-texto' }, el('b', {}, ejemplo(e.titulo)), el('i', {}, ejemplo(e.texto))),
+      el('div', { class: 'mini-texto' }, el('b', {}, ejemplo(e.titulo)), el('i', {}, leerCuestionario(e) ? 'Cuestionario por gestos · 2 preguntas · QR por ciudad' : ejemplo(e.texto))),
       el('img', { class: 'marca-agua', src: claro ? '../assets/logo-color.png' : '../assets/logo-blanco.png', alt: '' }),
     );
   }
@@ -438,6 +439,7 @@ zona.addEventListener('drop', (ev) => { ev.preventDefault(); zona.classList.remo
 $('#nuevoMensaje').addEventListener('click', () => editarEscena({ tipo: 'mensaje', nombre: '', titulo: '', texto: '', fondo: null, imagen: null, duracion: 8 }));
 
 function editarEscena(e) {
+  if (leerCuestionario(e)) return editarCuestionario(e);
   const b = { ...e };
   const previa = el('div', { class: 'vista-previa' });
   const repintar = () => previa.replaceChildren(miniatura(b));
@@ -825,3 +827,42 @@ $('#formEquipo').addEventListener('submit', async (ev) => {
 const { data: { session } } = await sb.auth.getSession();
 if (session) entrar(session);
 else $('#acceso').hidden = false;
+
+// Cuestionarios: usan las columnas existentes de mensajes; no necesitan migraciones.
+$('#nuevoCuestionario').addEventListener('click', () => editarCuestionario({ nombre: 'Veocasas · encontrá tu hogar', tipo: 'mensaje' }));
+function editarCuestionario(escena) {
+  const c = structuredClone(leerCuestionario(escena) || inmobiliario());
+  let nombre = escena.nombre;
+  const campo = (etiqueta, objeto, clave, props = {}) => el('label', {}, etiqueta, el('input', {
+    value: objeto[clave], required: true, ...props,
+    oninput: ev => { objeto[clave] = props.type === 'number' ? Number(ev.target.value) : ev.target.value; },
+  }));
+  const cuerpo = [
+    el('label', {}, 'Nombre del contenido', el('input', { value: nombre, required: true, oninput: ev => { nombre = ev.target.value; } })),
+    campo('Título de la invitación', c, 'titulo'), campo('Invitación a acercarse', c, 'invitacion'),
+    campo('Primera pregunta (sí / no)', c, 'pregunta'), campo('Pregunta de destino', c, 'destino'),
+    campo('Mensaje si responde no', c, 'despedida'),
+    campo('Tiempo por pregunta (segundos)', c, 'espera', { type: 'number', min: 3, max: 120 }),
+    campo('Tiempo del resultado (segundos)', c, 'resultado', { type: 'number', min: 3, max: 120 }),
+    campo('Sostener gesto (segundos)', c, 'sostener', { type: 'number', min: 0.3, max: 3, step: 0.1 }),
+    el('p', { class: 'ayuda' }, 'Sí 👍 / No 👎. Destinos: 👍, 👎, ✌️, 🖐️. Se debe soltar el gesto antes de responder la siguiente pregunta. También funciona con toque o teclas 1–4.'),
+  ];
+  c.ciudades.forEach((d, i) => cuerpo.push(el('h3', {}, 'Destino ' + (i + 1)),
+    campo('Ciudad', d, 'nombre'), campo('Título del resultado', d, 'titulo'), campo('Texto del resultado', d, 'texto'),
+    campo('Enlace de Veocasas con el filtro de esta ciudad', d, 'url', { type: 'url', placeholder: 'https://…' })));
+  cuerpo.push(el('p', { class: 'ayuda' }, 'El QR se genera en la pantalla. Los enlaces incluyen ciudad y pantalla para atribución en la web de destino. Un QR mostrado no cuenta como escaneo. Las respuestas aparecen en Estadísticas con el prefijo Cuestionario.'));
+  abrirDialogo(escena.id ? 'Editar cuestionario' : 'Cuestionario inmobiliario', cuerpo, {
+    alBorrar: escena.id ? () => borrarEscena(escena) : null,
+    alGuardar: async () => {
+      validarCuestionario(c);
+      if (!nombre.trim() || c.ciudades.some(d => !d.url)) throw new Error('Completá el nombre y los cuatro enlaces de Veocasas.');
+      const fila = { nombre: nombre.trim(), titulo: c.titulo, texto: MARCA + JSON.stringify(c), duracion: 18 };
+      const { error } = escena.id ? await sb.from('activador_escenas').update(fila).eq('id', escena.id)
+        : await sb.from('activador_escenas').insert({ ...fila, tipo: 'mensaje' });
+      if (error) throw error;
+      avisar(null, 'recargar');
+      nota('Cuestionario guardado. Sumalo a la rotación de la pantalla de Mercedes o a una regla.');
+      await cargar();
+    },
+  });
+}
