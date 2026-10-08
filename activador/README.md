@@ -16,7 +16,22 @@ y abrir `http://localhost:8000/activador/?panel`. La cámara y el micrófono nec
 - **1 a 4**: disparan escenas a mano (sirven para probar y para botones físicos).
 - Simular contexto por la dirección: `?temp=30`, `?lluvia=1`, `?uv=9`, `?hora=08:30`. `?camara=0` arranca sin cámara.
 
-## Cómo funciona
+## Panel de administración
+`http://localhost:8000/activador/panel.html`: contenidos, reglas y pantallas sin tocar código. Los datos están en Supabase, en el proyecto **sunsignal**, en tablas propias que empiezan con `activador_` (no se mezclan con las de sunsignal). Las fotos y videos van al bucket `activador`.
+
+- **Entrar**: con mail y contraseña. Solo pueden entrar los mails de la sección Equipo. La primera vez, cada persona toca "Crear cuenta" y confirma desde el mail que le llega.
+- **Pantallas**: cada una tiene su enlace (`index.html?pantalla=CLAVE`), que es lo que se abre en el equipo de la pantalla. Ahí se elige la ciudad (para el clima) y la rotación, y se ve si está en línea y qué está mostrando. "Mostrar ahora" manda un contenido al instante.
+- **Contenidos**: subir fotos y videos (o arrastrarlos), y crear mensajes con la marca con vista previa.
+- **Reglas**: "cuando… → mostrar / rotar…" con menús, sin código. Se pueden encender y apagar.
+- **Estadísticas**: disparos por día y por regla, con descarga en CSV.
+
+Al guardar, las pantallas se recargan solas. Si la red bloquea la conexión en vivo (WebSockets), igual toman los cambios en hasta 2 minutos, pero "Mostrar ahora" no llega. Las pantallas guardan la última configuración: si se corta internet, siguen con lo que tenían, aunque las fotos subidas al panel necesitan conexión la primera vez.
+
+Sin `?pantalla=` en la dirección, el reproductor usa `config.js` como antes.
+
+La clave de la pantalla va en su enlace: quien la tenga puede ver su configuración y mandarle "Mostrar ahora" con contenidos que ya existen. Para cambiarla, borrar la pantalla y crear otra.
+
+## Cómo funciona (sin panel)
 Todo se arma en `config.js`:
 
 1. **Escenas**: lo que se puede mostrar. Imagen, video o mensaje con la marca (título, texto, foto de fondo). Los textos aceptan `{saludo}`, `{hora}`, `{temp}`, `{ciudad}`, `{personas}` y `{vehiculos}`, que se completan en vivo.

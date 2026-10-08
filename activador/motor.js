@@ -1,9 +1,24 @@
 // Activador · motor de reglas, reproductor y panel de control
-import config from './config.js';
+import configLocal from './config.js';
 import { crearSenales, iniciarCamara, iniciarClima, iniciarSonido, iniciarEntradas } from './disparadores.js';
+import { conectarPantalla } from './nube.js';
 
 const params = new URLSearchParams(location.search);
 const escenario = document.getElementById('escenario');
+
+// Con ?pantalla=CLAVE los contenidos y las reglas vienen del panel; sin eso, de config.js
+let nube = null;
+if (params.get('pantalla')) {
+  try {
+    nube = await conectarPantalla(params.get('pantalla'));
+  } catch (e) {
+    escenario.innerHTML = '<div class="capa visible escena-mensaje" style="--fondo:#eb691c"><div class="mensaje"><h1>Sin conexión</h1><p></p></div></div>';
+    escenario.querySelector('p').textContent = e.message + ' Se reintenta en un minuto.';
+    setTimeout(() => location.reload(), 60000);
+    throw e;
+  }
+}
+const config = nube ? { ...configLocal, ...nube.config } : configLocal;
 const panel = document.getElementById('panel');
 const s = crearSenales();
 
@@ -164,6 +179,7 @@ const abrir = (r, ahora) => {
   evento = { regla: r, inicio: ahora, ultimaVez: ahora };
   mostrar(id);
   contar(r.nombre);
+  nube?.disparo(r.nombre);
   anotar('▶ ' + r.nombre);
 };
 const cerrar = (ahora) => {
@@ -243,7 +259,7 @@ const pintarPanel = () => {
     ['', s.climaEstado],
     ['Sonido', s.sonidoEstado === 'ok' ? fmt(s.sonido) : s.sonidoEstado],
     ['Hora', s.fecha.toLocaleTimeString('es-UY', { hour: '2-digit', minute: '2-digit' }) + (horaForzada ? ' (simulada)' : '')],
-    ['En pantalla', (escenaActual || '–') + (evento ? ' · por "' + evento.regla.nombre + '"' : '')],
+    ['En pantalla', (config.escenas[escenaActual]?.nombre || escenaActual || '–') + (evento ? ' · por "' + evento.regla.nombre + '"' : '')],
   ];
   panel.querySelector('.senales').innerHTML = filas.map(([a, b]) => '<dt>' + a + '</dt><dd>' + esc(b) + '</dd>').join('');
   panel.querySelector('.reglas').innerHTML = reglas.map((r) => {
@@ -318,4 +334,31 @@ if (usa('sonido')) iniciarSonido(s);
 s.fecha = reloj();
 siguienteDeTanda();
 setInterval(paso, 100);
+
+// ---------- Conexión con el panel ----------
+if (nube) {
+  // "Mostrar ahora" desde el panel: entra como un evento de prioridad máxima
+  nube.alMostrar((id) => {
+    const e = config.escenas[id];
+    if (!e) return;
+    const t = e.duracion || 10;
+    if (evento) cerrar(performance.now());
+    abrir({ nombre: 'Desde el panel', mostrar: [id], indice: 0, prioridad: 1000, minimo: t, maximo: t, mantener: 0, enfriamiento: 0 }, performance.now());
+  });
+  // Solo números: nunca se envían imágenes
+  const estado = () => ({
+    escena: config.escenas[escenaActual]?.nombre || escenaActual,
+    regla: evento?.regla.nombre || null,
+    camara: s.camara.estado,
+    personas: s.personas,
+    cercania: Math.round(s.cercania * 100) / 100,
+    vehiculos: s.vehiculos,
+    gesto: s.gesto,
+    temperatura: s.clima?.temperatura ?? null,
+    lluvia: s.clima?.lluvia ?? null,
+  });
+  nube.latido(estado());
+  setInterval(() => nube.latido(estado()), 60000);
+  setInterval(() => nube.estadoEnVivo(estado()), 2000);
+}
 setInterval(() => { pintarPanel(); escenario.querySelectorAll('.capa').forEach(pintarTextos); }, 200);
